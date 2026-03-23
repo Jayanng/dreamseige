@@ -28,6 +28,7 @@ export default function Siege() {
   const { isLoading: siegeConfirming, isSuccess: siegeConfirmed } = useWaitForTransactionReceipt({ hash: siegeHash });
 
   const { writeContract: interceptRaid, isPending: interceptPending, data: interceptHash } = useWriteContract();
+  const { isLoading: interceptConfirming } = useWaitForTransactionReceipt({ hash: interceptHash });
   const { writeContract: resolveRaid, isPending: resolvePending, data: resolveHash } = useWriteContract();
 
   const { data: attackerVaultData } = useReadContract({
@@ -360,7 +361,6 @@ export default function Siege() {
             topics: log.topics
           });
           const { winner, attackerWon, creditsLooted } = decoded.args as any;
-          const args = decoded.args as any;
           console.log("[Phase 7] Intercept resolved! winner:", winner);
 
           const isWinner = winner.toLowerCase() === address?.toLowerCase();
@@ -388,16 +388,42 @@ export default function Siege() {
           setActiveBattleId(null);
           setIncomingAttacker(null);
           setEtaSeconds(0);
+        } else if (receipt.status === 'reverted') {
+          // Transaction was reverted — likely a timing or state issue. Let subscriptions handle it.
+          console.warn("[Phase 7] Intercept tx reverted. Waiting for subscription fallback...");
+        } else {
+          // Receipt confirmed but no BattleResolved log found — query battle state directly
+          console.warn("[Phase 7] No BattleResolved log in intercept receipt. Checking battle state...");
+          if (activeBattleId) {
+            try {
+              const battle = await publicClient.readContract({
+                address: CONTRACT_ADDRESSES.PVP_ARENA,
+                abi: PVP_ARENA_ABI,
+                functionName: 'getBattle',
+                args: [activeBattleId]
+              }) as any;
+              if (battle && (battle.status === 2 || battle.status === 3)) {
+                const winner = battle.attackerWon ? battle.attacker : battle.defender;
+                const isWinner = winner?.toLowerCase() === address?.toLowerCase();
+                setBattleResult({
+                  won: isWinner,
+                  loot: Number(battle.lootCredits || 0),
+                  target: incomingAttacker || selectedTarget || "Opponent"
+                });
+                setActiveBattleId(null);
+                setIncomingAttacker(null);
+                setEtaSeconds(0);
+              }
+            } catch (fallbackErr) {
+              console.error("[Phase 7] Fallback battle query failed:", fallbackErr);
+            }
+          }
         }
       } catch (e) {
         console.error("[Phase 7] Intercept receipt parsing failed:", e);
       }
     };
     processInterceptReceipt();
-  }, [interceptHash]);
-
-  useEffect(() => {
-
   }, [interceptHash]);
 
   // 3.5. Defender Fallback Polling (detects if battle resolves without defender action)
@@ -1212,7 +1238,7 @@ export default function Siege() {
                   </button>
                 ) : (
                   <button
-                    disabled={!activeBattleId || interceptPending}
+                    disabled={!activeBattleId || interceptPending || interceptConfirming}
                     onClick={handleIntercept}
                     className="w-full relative overflow-hidden group py-3 rounded-lg border border-[#F72585] bg-[#F72585]/10 text-[#F72585] font-bold text-xs uppercase tracking-widest transition-all active:scale-[0.98] disabled:opacity-50 disabled:grayscale hover:bg-[#F72585] hover:text-white"
                     style={{ boxShadow: '0 0 15px rgba(247,37,133,0.2)' }}
@@ -1220,7 +1246,7 @@ export default function Siege() {
                     <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-[radarSweep_1.5s_infinite]" />
                     <span className="relative z-10 flex items-center justify-center gap-2">
                       <Shield className="w-4 h-4" />
-                      {interceptPending ? 'INTERCEPTING...' : 'Intercept Protocol'}
+                      {interceptPending ? 'INTERCEPTING...' : interceptConfirming ? 'CONFIRMING...' : 'Intercept Protocol'}
                     </span>
                   </button>
                 )}
