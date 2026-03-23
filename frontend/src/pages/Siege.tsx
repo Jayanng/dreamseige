@@ -8,17 +8,6 @@ import { publicClient } from '../lib/somniaClients';
 import { Shield, ShieldAlert, Trophy, Skull, Crosshair, Target, Activity, RefreshCw } from 'lucide-react';
 import { useAccount, useReadContract, useReadContracts, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 
-const BOSS_ADDRESS = "0xb8457d25885ffe2518266644474544cf6651b44d";
-const BOSS_TARGET = {
-  address: BOSS_ADDRESS as `0x${string}`,
-  name: "⚔️ Somnia Hackathon Boss",
-  wins: 99,
-  loot: "5000",
-  def: 9999,
-  winChance: 1, // High difficulty
-  lastActivityAt: Math.floor(Date.now() / 1000),
-  isOnline: true
-};
 
 export default function Siege() {
   const { address } = useAccount();
@@ -700,11 +689,11 @@ export default function Siege() {
     setOnlineStatus(newStatus);
   }, [statsData, topPlayersData]);
 
-  const topPlayers = useMemo(() => {
-
+  const { onlineTargets, idleTargets } = useMemo(() => {
     const fetchedPlayers = topPlayersData ? (topPlayersData as [string[], number[], string[]])[0].map((addr, i) => {
       const lastActivity = onlineStatus[addr.toLowerCase()] || 0;
-      const isOnline = (Math.floor(Date.now() / 1000) - lastActivity) < 300;
+      // Increased window to 10 minutes (600s)
+      const isOnline = (Math.floor(Date.now() / 1000) - lastActivity) < 600;
 
       return {
         address: addr,
@@ -717,19 +706,19 @@ export default function Siege() {
       };
     }) : [];
 
-    const allTargets = [BOSS_TARGET, ...fetchedPlayers, ...manualTargets];
+    const allTargets = [...fetchedPlayers, ...manualTargets];
 
-    const finalTargets = allTargets.filter(
+    const uniqueTargets = allTargets.filter(
       (target, index, self) =>
         target.address.toLowerCase() !== address?.toLowerCase() &&
-        index === self.findIndex((t) => t.address.toLowerCase() === target.address.toLowerCase()) // remove duplicates
+        index === self.findIndex((t) => t.address.toLowerCase() === target.address.toLowerCase())
     );
 
-
-    return finalTargets;
+    return {
+      onlineTargets: uniqueTargets.filter(t => t.isOnline),
+      idleTargets: uniqueTargets.filter(t => !t.isOnline)
+    };
   }, [topPlayersData, address, onlineStatus, manualTargets]);
-
-  const validTargets = topPlayers;
 
   const selectTarget = (target: any) => {
     setSelectedTarget(target.address);
@@ -862,74 +851,99 @@ export default function Siege() {
                 <RefreshCw className={`w-3 h-3 text-[#5A5880] ${topPlayersLoading ? 'animate-spin' : ''}`} />
               </button>
             </div>
-            <div className="space-y-2 max-h-52 overflow-y-auto custom-scrollbar pr-1">
-              {validTargets.length > 0 ? (
-                validTargets.map((t: any) => (
-                  <div
-                    key={t.address}
-                    onClick={() => selectTarget(t)}
-                    className={`group relative flex flex-col p-4 rounded-xl bg-[#0F0F1E] border cursor-pointer overflow-hidden transition-all duration-300 ${selectedTarget === t.address
-                        ? 'border-[#00F5D4] bg-[#00F5D4]/10 targeted-reticle shadow-[inset_0_0_20px_rgba(0,245,212,0.15)]'
-                        : 'border-[#2A2A45] hover:border-[#9B5DE5]/80 hover:bg-[#9B5DE5]/5'
-                      }`}
-                  >
-                    <div className="flex items-center justify-between z-10">
-                      <div className="flex items-center gap-3">
-                        <div className="relative">
-                          {selectedTarget === t.address ? (
-                            <Target className="w-4 h-4 text-[#00F5D4] animate-pulse drop-shadow-[0_0_8px_rgba(0,245,212,0.8)]" />
-                          ) : (
-                            <Crosshair className="w-4 h-4 text-[#5A5880] group-hover:text-[#9B5DE5] transition-colors" />
-                          )}
-                          {t.isOnline && (
+            <div className="space-y-4 max-h-[400px] overflow-y-auto custom-scrollbar pr-1">
+              {/* --- ONLINE SECTION --- */}
+              <div className="space-y-2">
+                {onlineTargets.length > 0 ? (
+                  onlineTargets.map((t: any) => (
+                    <div
+                      key={t.address}
+                      onClick={() => selectTarget(t)}
+                      className={`group relative flex flex-col p-4 rounded-xl bg-[#0F0F1E] border cursor-pointer overflow-hidden transition-all duration-300 ${selectedTarget === t.address
+                          ? 'border-[#00F5D4] bg-[#00F5D4]/10 targeted-reticle shadow-[inset_0_0_20px_rgba(0,245,212,0.15)]'
+                          : 'border-[#2A2A45] hover:border-[#9B5DE5]/80 hover:bg-[#9B5DE5]/5'
+                        }`}
+                    >
+                      <div className="flex items-center justify-between z-10">
+                        <div className="flex items-center gap-3">
+                          <div className="relative">
+                            {selectedTarget === t.address ? (
+                              <Target className="w-4 h-4 text-[#00F5D4] animate-pulse drop-shadow-[0_0_8px_rgba(0,245,212,0.8)]" />
+                            ) : (
+                              <Crosshair className="w-4 h-4 text-[#5A5880] group-hover:text-[#9B5DE5] transition-colors" />
+                            )}
                             <motion.span
                               initial={{ scale: 0 }}
                               animate={{ scale: 1 }}
                               className="absolute -top-1 -right-1 w-2 h-2 bg-accent-teal rounded-full border border-[#0F0F1E] z-20"
                               style={{ boxShadow: '0 0 8px rgba(0, 245, 212, 0.8)' }}
                             />
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className={`font-mono text-sm ${selectedTarget === t.address ? 'text-[#00F5D4]' : 'text-[#D4D0F0]'}`}>
-                            {(t as any).name || t.address.slice(0, 8) + '...'}
-                          </span>
-                          {t.isOnline && (
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={`font-mono text-sm ${selectedTarget === t.address ? 'text-[#00F5D4]' : 'text-[#D4D0F0]'}`}>
+                              {(t as any).name || t.address.slice(0, 8) + '...'}
+                            </span>
                             <span className="text-[8px] font-mono text-accent-teal animate-pulse uppercase tracking-tighter bg-accent-teal/10 px-1 rounded border border-accent-teal/30">Live</span>
-                          )}
+                          </div>
                         </div>
-                      </div>
 
-                      <div className="flex flex-col items-end gap-1">
-                        <span className={`font-mono text-xs font-bold drop-shadow-[0_0_5px_rgba(255,214,10,0.4)] ${selectedTarget === t.address ? 'text-[#00F5D4]' : 'text-[#FFD60A]'}`}>
-                          ~{t.loot}K
-                        </span>
-                        {/* Threat Level Bar */}
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[9px] font-mono text-[#6B68A0]">DEF</span>
-                          <div className="flex gap-0.5">
-                            {[1, 2, 3, 4, 5].map(i => (
-                              <div key={i} className={`h-1.5 w-1.5 rounded-sm ${i <= Math.ceil(t.def / 50) ? 'bg-[#F72585]' : 'bg-[#2A2A45]'}`}></div>
-                            ))}
+                        <div className="flex flex-col items-end gap-1">
+                          <span className={`font-mono text-xs font-bold drop-shadow-[0_0_5px_rgba(255,214,10,0.4)] ${selectedTarget === t.address ? 'text-[#00F5D4]' : 'text-[#FFD60A]'}`}>
+                            ~{t.loot}K
+                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[9px] font-mono text-[#6B68A0]">DEF</span>
+                            <div className="flex gap-0.5">
+                              {[1, 2, 3, 4, 5].map(i => (
+                                <div key={i} className={`h-1.5 w-1.5 rounded-sm ${i <= Math.ceil(t.def / 50) ? 'bg-[#F72585]' : 'bg-[#2A2A45]'}`}></div>
+                              ))}
+                            </div>
                           </div>
                         </div>
                       </div>
+                      {selectedTarget !== t.address && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#9B5DE5]/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
+                      )}
                     </div>
-
-                    {/* Hover "LOCK ON" state */}
-                    {selectedTarget !== t.address && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#9B5DE5]/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
-                    )}
-                    {selectedTarget !== t.address && (
-                      <div className="absolute right-4 bottom-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <span className="text-[9px] font-mono font-bold text-[#9B5DE5] uppercase tracking-widest drop-shadow-[0_0_4px_rgba(155,93,229,0.8)]">Lock On</span>
-                      </div>
-                    )}
+                  ))
+                ) : (
+                  <div className="p-4 text-center text-primary/30 font-mono text-[10px] border border-primary/10 rounded-lg dashed">
+                    📡 NO HIGH-ACTIVITY SIGNALS IN SECTOR.
                   </div>
-                ))
-              ) : (
-                <div className="p-4 text-center text-primary/50 font-mono text-sm border border-primary/20 rounded-lg">
-                  📡 SCANNING... NO ENEMY EMPIRES DETECTED IN SECTOR.
+                )}
+              </div>
+
+              {/* --- IDLE SECTION --- */}
+              {idleTargets.length > 0 && (
+                <div className="pt-4 border-t border-[#2A2A45]/30">
+                  <h3 className="text-[9px] font-mono font-bold uppercase tracking-[0.2em] text-[#4A4870] mb-3 px-1">
+                    Detected Signals (Idle)
+                  </h3>
+                  <div className="space-y-2 opacity-60 hover:opacity-100 transition-opacity duration-500">
+                    {idleTargets.map((t: any) => (
+                      <div
+                        key={t.address}
+                        onClick={() => selectTarget(t)}
+                        className={`group relative flex flex-col p-3 rounded-lg bg-[#0A0A14] border cursor-pointer overflow-hidden transition-all duration-300 ${selectedTarget === t.address
+                            ? 'border-[#9B5DE5]/60 bg-[#9B5DE5]/5'
+                            : 'border-[#1A1A2A] hover:border-[#2A2A45] hover:bg-[#0F0F1E]'
+                          }`}
+                      >
+                        <div className="flex items-center justify-between z-10">
+                          <div className="flex items-center gap-3">
+                            <Activity className="w-3 h-3 text-[#3A3860]" />
+                            <span className={`font-mono text-xs ${selectedTarget === t.address ? 'text-[#9B5DE5]' : 'text-[#6B68A0]'}`}>
+                              {(t as any).name || t.address.slice(0, 8) + '...'}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-[10px] font-mono text-[#4A4870]">OFFLINE</span>
+                            <span className="font-mono text-[10px] text-[#5A5880]">~{t.loot}K</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

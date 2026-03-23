@@ -646,51 +646,51 @@ export function useReactivity() {
   const subscribeToAllActivity = useCallback((
     callback: (actor: `0x${string}`) => void
   ) => {
+    const unsubs: Array<() => void> = [];
+
     // 1. ResourcesCollected (BaseContract)
-    const sub1 = safeSubscribe({
+    safeSubscribe({
       ethCalls: [],
       eventContractSources: [CONTRACT_ADDRESSES.BASE_CONTRACT],
       topicOverrides: encodeEventTopics({ abi: BASE_CONTRACT_ABI, eventName: "ResourcesCollected" }),
       onData: (data: any) => {
-        const log = decodeEventLog({ abi: BASE_CONTRACT_ABI, data: data.result.data, topics: data.result.topics });
-        callback((log.args as any).collector);
+        try {
+          const log = decodeEventLog({ abi: BASE_CONTRACT_ABI, data: data.result.data, topics: data.result.topics });
+          callback((log.args as any).collector);
+        } catch (e) {}
       }
-    }, (u) => unsubsRef.current.push(u));
+    }, (u) => { unsubs.push(u); unsubsRef.current.push(u); });
 
-    // 2. BuildingPlaced (BaseContract)
-    const sub2 = safeSubscribe({
-      ethCalls: [],
-      eventContractSources: [CONTRACT_ADDRESSES.BASE_CONTRACT],
-      topicOverrides: encodeEventTopics({ abi: BASE_CONTRACT_ABI, eventName: "BuildingPlaced" }),
-      onData: (data: any) => {
-        const log = decodeEventLog({ abi: BASE_CONTRACT_ABI, data: data.result.data, topics: data.result.topics });
-        // BuildingPlaced doesn't have address in args, but we can infer or use other events.
-        // Actually, let's skip this if it doesn't have the address.
-      }
-    }, (u) => unsubsRef.current.push(u));
-
-    // 3. ChallengeIssued (PvPArena)
-    const sub3 = safeSubscribe({
+    // 2. ChallengeIssued (PvPArena)
+    safeSubscribe({
       ethCalls: [],
       eventContractSources: [CONTRACT_ADDRESSES.PVP_ARENA],
       topicOverrides: encodeEventTopics({ abi: PVP_ARENA_ABI, eventName: "ChallengeIssued" }),
       onData: (data: any) => {
-        const log = decodeEventLog({ abi: PVP_ARENA_ABI, data: data.result.data, topics: data.result.topics });
-        callback((log.args as any).attacker);
+        try {
+          const log = decodeEventLog({ abi: PVP_ARENA_ABI, data: data.result.data, topics: data.result.topics });
+          callback((log.args as any).attacker);
+        } catch (e) {}
       }
-    }, (u) => unsubsRef.current.push(u));
+    }, (u) => { unsubs.push(u); unsubsRef.current.push(u); });
 
-    const sub4 = safeSubscribe({
+    // 3. BattleResolved (PvPArena) - winner and loser are active
+    safeSubscribe({
       ethCalls: [],
       eventContractSources: [CONTRACT_ADDRESSES.PVP_ARENA],
-      topicOverrides: encodeEventTopics({ abi: PVP_ARENA_ABI, eventName: "GlobalBattleEvent" }),
-      onData: (_data: any) => {
-        // GlobalBattleEvent has no attacker field, skip to avoid decode errors
+      topicOverrides: encodeEventTopics({ abi: PVP_ARENA_ABI, eventName: "BattleResolved" }),
+      onData: (data: any) => {
+        try {
+          const log = decodeEventLog({ abi: PVP_ARENA_ABI, data: data.result.data, topics: data.result.topics });
+          const args = log.args as any;
+          callback(args.winner);
+          callback(args.loser);
+        } catch (e) {}
       }
-    }, (u) => unsubsRef.current.push(u));
+    }, (u) => { unsubs.push(u); unsubsRef.current.push(u); });
 
     return () => {
-      // Manual cleanup if needed, though they are in unsubsRef
+      unsubs.forEach(u => u());
     };
   }, [safeSubscribe]);
 
