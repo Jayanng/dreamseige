@@ -1,0 +1,12 @@
+# Foundry / Hardhat
+out/
+cache/
+artifacts/
+lib/
+broadcast/
+
+# Environment Variables (CRITICAL)
+.env
+
+# Dependencies
+node_modules/

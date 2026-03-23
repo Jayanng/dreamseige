@@ -1,0 +1,989 @@
+No files changed, compilation skipped
+Contract: BaseContract
+.\foundry_bin\forge.exe : Warning: Dry run enabled, not 
+broadcasting transaction
+At line:1 char:121
++ ... 2e66bca4f0; .\foundry_bin\forge.exe create 
+src/BaseContract.sol:BaseC ...
++                 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Warning: Dry ru...ing  
+   transaction:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+Transaction: {
+  "from": "0xb8457d25885ffe2518266644474544cf6651b44d",
+  "to": null,
+  "gasPrice": "0x165a0bc00",
+  "gas": "0x2b2b893",
+  "input": "0x6080806040523461002857600780546001600160a01b03191633179055612319908161002d8239f35b5f80fdfe6080806040526004361015610012575f80fd5b5f905f3560e01c90816306f88d2814611b205750806307e0742c14611ad057806309c740f114611a2f5780630e94a45714611a0757806339d19984146119d05780633bbfe141146119295780633fdeaf84146118d457806342af7437146118ac57806346d7880b1461182a57806347eb7b0e1461180f57806348bf3d03146117a5578063494b65a61461028a578063533a5688146114fd5780636816a72514610f225780636bd0582114610f075780636e5cf15c14610eb75780637204184814610dd55780638cedcd7514610d855780638da5cb5b14610d5d5780639382e02414610d4257806395ffef5214610ac8578063b5dbe5cb14610a7d578063c1e5efb3146109d9578063c7f10147146109be578063c87f3c031461065d578063ce816a961461028f578063fc44fb961461028a5763fe92a8be14610152575f80fd5b34610287576020806003193601126102835761016c611e34565b60405190610c808083018381106001600160401b0382111761026f5760405283855b82811061025b575050506001600160a01b03168352828252604083205490835b60ff808216906064821015610228579161022060019260ff946101d1848961223c565b8a526002895264ffffffffff60408b2091604051926101ef84611f4c565b54906101fd81831685611fd9565b8160081c168b84015260101c1660408201526102198288612026565b5285612026565b5001166101ae565b604051848789835b6064821061023e5761258085f35b8260608261024f6001948851611e57565b01940191019092610230565b610263611fbb565b8186015201849061018e565b634e487b7160e01b5f52604160045260245ffd5b5080fd5b80fd5b611e81565b5034610287576040366003190112610287576102a9611e24565b6008602435101561028357338083526020838152604080852054855260019091528320546001600160a01b03160361064b57606460ff8216101561063957602435156106395733825281602052604082205490610306818361223c565b8352600260205260ff6040842054166008811015610625576106135761032c818361223c565b6040519061033982611f4c565b61034560243583611fd9565b60016020830152846040830152845260026020526040842081519160088310156105ff57927faa07da6f5fd821d8804f74b17a7861de01db231c21cc0932a14bb5726029b5e4926103ed60409364ffffffffff85899860ff199560ff8786541691161784556103cc60ff602083015116859061ff0082549160081b169061ff001916179055565b0151825466ffffffffff00001916911660101b66ffffffffff000016179055565b84875260016020526003838820019081549060ff61040c818416612015565b16911617905560ff82519116815261042960208201602435611e4a565ba281829083838552600160205260ff60036040872001541690855b606460ff821610610500575b505050907f39d196b41e481725f432a1770bd3bb056d2f7528e9178b27f3f13beaf34d79599163ffffffff600a818316106104f7575b600a908316106104ee575b838552600160208190526040862001805463ffffffff60a01b60a085901b1667ffffffffffffffff60801b1990911663ffffffff60801b608085901b16171790556040805163ffffffff928316815292909116602083015290a280f35b600a9150610491565b600a9150610486565b8260ff831610156105fa57610515818761223c565b87526002602052604087205491600860ff841610156105e65760ff8316156105da5761054090612015565b91600460ff8216146105c0575b600560ff8216146105a6575b600660ff821614610573575b50600160ff915b0116610444565b61059e60ff92966105926105988560019560081c16986105928a61229a565b906122cb565b9761229a565b959150610565565b946105ba9061059260ff8860081c16612282565b94610559565b936105d49061059260ff8760081c1661226a565b9361054d565b9150600160ff9161056c565b634e487b7160e01b88526021600452602488fd5b610450565b634e487b7160e01b86526021600452602486fd5b60405163df3a8fdd60e01b8152600490fd5b634e487b7160e01b84526021600452602484fd5b604051631258e44360e01b8152600490fd5b6040516313a334ad60e11b8152600490fd5b50346109a1575f3660031901126109a157335f525f60205260405f20546109ad5760405160208101903360601b82524260348201526034815261069f81611f4c565b51902080156109a5575b335f525f6020528060405f20556040516106c281611f67565b33815260ff6101a0600360208401600181526101f4604086015261012c8060608701526080860152600a60a0860152600a60c086015264ffffffffff421660e08601525f6101008601525f6101208601525f6101408601525f6101608601525f6101808601525f83860152855f52600160205260405f209060018060a01b038651168254918660a01b9051151560a01b16916affffffffffffffffffffff60a81b16171781556107a16001600160401b0360408701511682908154906001600160401b0360a81b9060a81b16906001600160401b0360a81b1916179055565b610902600182016001600160401b036060880151166001600160401b03198254161781556107dc6001600160401b0360808901511682611f09565b60a0870151815463ffffffff60801b191660809190911b63ffffffff60801b1617815563ffffffff906108539060c0890151815463ffffffff60a01b191690841660a01b63ffffffff60a01b1617815560e0890151815464ffffffffff60c01b191660c09190911b64ffffffffff60c01b16179055565b6101008701516002840180546101208a015167ffffffff00000000199385169390931667ffffffffffffffff19909116179190921660201b67ffffffff00000000161781556108b06001600160401b036101408901511682611f09565b610160870151815467ffffffffffffffff60801b191660809190911b67ffffffffffffffff60801b1617815561018087015181546001600160c01b031660c09190911b6001600160c01b031916179055565b019201511660ff1982541617905560018060a01b03600654168061094a575b50337fc24c2cfe6f69395aa53434cd1c8aee28ad6838d3ae11800b78e0514c9dffe6bf8380a380f35b803b156109a1575f8091602460405180948193630ccb6a2760e41b83523360048401525af180156109965715610921579091506001600160401b03811161026f576040525f905f610921565b6040513d5f823e3d90fd5b5f80fd5b5060016106a9565b60405162dc149f60e41b8152600490fd5b346109a1575f3660031901126109a1576020604051600a8152f35b346109a15760203660031901126109a1575f60606040516109f981611f31565b82815282602082015282604082015201526004355f526003602052608060405f20604051610a2681611f31565b6001825492838352015490602081019060ff8316825260ff64ffffffffff928160606040850194868860081c168652019560301c161515855260405195865251166020850152511660408301525115156060820152f35b346109a15760203660031901126109a1576001600160a01b03610a9e611e34565b165f525f60205260405f20545f526001602052602060ff60405f205460a01c166040519015158152f35b346109a15760203660031901126109a157610ae1611e34565b5f6101a0604051610af181611f67565b8281528260208201528260408201528260608201528260808201528260a08201528260c08201528260e08201528261010082015282610120820152826101408201528261016082015282610180820152015260018060a01b03165f525f60205260405f20545f5260016020526101c060405f2060ff6101a0604051610b7581611f67565b82600385549560018060a01b0387168452828760a01c16151560208501526001600160401b038760a81c16604085015264ffffffffff60018201546001600160401b03811660608701526001600160401b038160401c16608087015263ffffffff8160801c1660a087015263ffffffff8160a01c1660c087015260c01c1660e0850152600281015463ffffffff811661010086015263ffffffff8160201c166101208601526001600160401b038160401c166101408601526001600160401b038160801c1661016086015260c01c610180850152015416828201526040519360018060a01b031684526020810151151560208501526001600160401b0360408201511660408501526001600160401b0360608201511660608501526001600160401b03608082015116608085015263ffffffff60a08201511660a085015263ffffffff60c08201511660c085015264ffffffffff60e08201511660e085015263ffffffff6101008201511661010085015263ffffffff610120820151166101208501526001600160401b03610140820151166101408501526001600160401b03610160820151166101608501526001600160401b03610180820151166101808501520151166101a0820152f35b346109a1575f3660031901126109a1576020604051601e8152f35b346109a1575f3660031901126109a1576007546040516001600160a01b039091168152602090f35b346109a15760203660031901126109a157610d9e611e34565b6007546001600160a01b039190610db89083163314611f83565b166bffffffffffffffffffffffff60a01b60065416176006555f80f35b346109a15760203660031901126109a1576004355f5260016020526101c060405f208054906001600160401b039060018101549163ffffffff64ffffffffff60ff600360028601549501541694836040519760018060a01b038116895260ff8160a01c16151560208a015260a81c1660408801528381166060880152838160401c166080880152828160801c1660a0880152828160a01c1660c088015260c01c1660e08601528083166101008601528260201c16610120850152808260401c166101408501528160801c1661016084015260c01c6101808301526101a0820152f35b346109a15760203660031901126109a1576004355f526002602052606060405f205464ffffffffff60405191610ef08360ff8316611e4a565b60ff8160081c16602084015260101c166040820152f35b346109a1575f3660031901126109a157602060405160648152f35b346109a15760203660031901126109a1576004355f52600360205260405f2060018101549060ff8260301c166114eb5764ffffffffff8260081c1642106114eb57660100000000000066ff000000000000198316176001820155610f8b60ff825493168361223c565b5f52600260205260405f209182549060ff8083169260081c16905f52600160205260405f2090610fba81611eb7565b60088410156113ae578360069160018096146114c8575b600282146114a5575b60038214611489575b5060048114611461575b60058114611439575b146113f3575b50018054600a63ffffffff8260801c16106113db575b508054600a63ffffffff8260a01c16106113c2575b505061105261103c60ff845460081c16612015565b835461ff00191660089190911b61ff0016178355565b80548254905f52600160205260405f209061107260ff8260081c16611eb7565b93600860ff831610156113ae5760017f465280a19d841e0c99929afe6a1dee5245903abc1e993471b2c18352632db9b5938382978360ff6060971614611385575b600260ff83161461133a575b600360ff8316146112fe575b50600460ff8216146112b0575b600560ff821614611282575b600660ff8216146111ee575b50018054600a63ffffffff8260801c16106111d6575b508054600a63ffffffff8260a01c16106111bd575b505080549066ffffffffff0000198216905560ff8085549687960154169160405192835260081c1660208201526004356040820152a2805f5260016020527f39d196b41e481725f432a1770bd3bb056d2f7528e9178b27f3f13beaf34d79596111b8600160405f200154604051918163ffffffff80859460a01c169160801c168390602090939293604083019463ffffffff809216845216910152565b0390a2005b63ffffffff60a01b1916600560a11b179055858061111b565b63ffffffff60801b1916600560811b17815586611106565b8061125c61124c60ff6112088161127c9660081c1661229a565b936112436112238989019663ffffffff885460801c166122cb565b865463ffffffff60801b191660809190911b63ffffffff60801b16178655565b60081c1661229a565b63ffffffff835460a01c166122cb565b815463ffffffff60a01b191660a09190911b63ffffffff60a01b16179055565b876110f0565b6112ab61129460ff8360081c16612282565b61125c8585019163ffffffff835460a01c166122cb565b6110e4565b6112f96112c260ff8360081c1661226a565b6112d98585019163ffffffff835460801c166122cb565b815463ffffffff60801b191660809190911b63ffffffff60801b16179055565b6110d8565b611334906113146002850191825460c01c611ffa565b81546001600160c01b031660c09190911b6001600160c01b031916179055565b886110cb565b61138060028401611358836001600160401b03835460801c16611ffa565b815467ffffffffffffffff60801b191660809190911b67ffffffffffffffff60801b16179055565b6110bf565b6113a9600284016113a3836001600160401b03835460401c16611ffa565b90611f09565b6110b3565b634e487b7160e01b5f52602160045260245ffd5b63ffffffff60a01b1916600560a11b1790558280611027565b63ffffffff60801b1916600560811b17815583611012565b8061125c6114036114339361229a565b6114278686019361142261122363ffffffff9485885460801c166122b5565b61229a565b90835460a01c166122b5565b84610ffc565b61145c61144584612282565b61125c8787019163ffffffff835460a01c166122b5565b610ff6565b61148461146d8461226a565b6112d98787019163ffffffff835460801c166122b5565b610fed565b61149f906113146002870191825460c01c611ef0565b87610fe3565b6114c360028601611358836001600160401b03835460801c16611ef0565b610fda565b6114e6600286016113a3836001600160401b03835460401c16611ef0565b610fd1565b6040516324fa2caf60e01b8152600490fd5b346109a15760c03660031901126109a157611516611e34565b6024356001600160a01b03818116918290036109a157604435906001600160401b03808316918284036109a15760643590828216948583036109a15760843590848216928383036109a15760a435998a15158b036109a1578160055416330361179357165f525f60205260405f2054975f5260405f2054975f52600160205260405f20975f5260405f20985f1461172d57906115ee91858a5460a81c168097115f146117255750859283915b8660018c01998a54978289168092115f1461171d5750965b60401c168092115f14611715575095611ef0565b875467ffffffffffffffff60a81b191660a89190911b67ffffffffffffffff60a81b1617875584549484848061162686828b16611ef0565b166001600160401b03198099161780845560401c169061164591611ef0565b61164e91611f09565b82865460a81c169061165f91611ffa565b855467ffffffffffffffff60a81b191660a89190911b67ffffffffffffffff60a81b161785556001850193828554928184169061169b91611ffa565b1691161780845560401c16906116b091611ffa565b6116b991611f09565b600201805463ffffffff929190836116d2818316611fe5565b169063ffffffff191617905560020190815460201c166116f190611fe5565b815467ffffffff00000000191660209190911b67ffffffff0000000016179055005b005b905095611ef0565b9050966115da565b9283916115c2565b5050505050505060028091019161177363ffffffff9361175285825460201c16611fe5565b67ffffffff0000000082549160201b169067ffffffff000000001916179055565b0190815490611783818316611fe5565b63ffffffff199092169116179055005b6040516364a0b59160e01b8152600490fd5b346109a15760203660031901126109a1576001600160a01b036117c6611e34565b16805f525f60205260405f20545f52600160205260ff60405f205460a01c16156117fd575f525f60205261171360405f205461204b565b6040516321c4e35760e21b8152600490fd5b346109a1575f3660031901126109a1576020604051603c8152f35b346109a15760203660031901126109a1576001600160a01b0361184b611e34565b165f525f60205260405f20545f52600160205260a060405f2060018101549063ffffffff916001600160401b0380925460a81c1660405193808360801c16855282861c1660208501526040840152818116606084015260401c166080820152f35b346109a1575f3660031901126109a1576005546040516001600160a01b039091168152602090f35b346109a15760203660031901126109a1576004355f526003602052608060405f2060ff60018254920154604051928352818116602084015264ffffffffff8160081c16604084015260301c1615156060820152f35b346109a1575f3660031901126109a157335f525f60205260405f20545f52600160205260ff60405f205460a01c16156117fd57335f525f60205260405f20546119718161204b565b805f52600160205260405f206001600160401b03600181835460a81c16920154604051928352818116602084015260401c1660408201527f48d9735f004509b73dcf0889387fa547b71eff68ad01fcedd665f0df7b24647c60603392a3005b346109a15760203660031901126109a1576001600160a01b036119f1611e34565b165f525f602052602060405f2054604051908152f35b346109a1575f3660031901126109a1576006546040516001600160a01b039091168152602090f35b346109a15760403660031901126109a157611a48611e34565b60243560ff811681036109a157611a7e91611a61611fbb565b506001600160a01b03165f9081526020819052604090205461223c565b5f526002602052606060405f2064ffffffffff60405191611a9e83611f4c565b54611aac60ff821684611fd9565b60ff8160081c16602084015260101c166040820152611ace6040518092611e57565bf35b346109a15760203660031901126109a157611ae9611e34565b6007546001600160a01b039190611b039083163314611f83565b166bffffffffffffffffffffffff60a01b60055416176005555f80f35b346109a157602090816003193601126109a157611b3b611e24565b91335f525f815260405f20545f526001918282523360018060a01b0360405f20541603611e15575060ff80841690606482101561063957335f525f8352611b9060405f205495611b8a8761204b565b8661223c565b5f526002835260405f209384549382851660088110156113ae5715611e0357828560081c16600a811015611df15764ffffffffff809660101c168015159081611de7575b50611dd5578201838111611d8c578316906001600160401b0360648302818116908103611d8c57611c0484611e9c565b90611c0e85611e9c565b8b5f5286855260405f209380855460a81c168381108015611dc5575b8015611db2575b611da057611c9c95611c72611c4a6113a3968c94611ef0565b825467ffffffffffffffff60a81b191660a89190911b67ffffffffffffffff60a81b16178255565b019381611c83865492828416611ef0565b16906001600160401b0319161780855560401c16611ef0565b81603c02868116908103611d8c578642160196868811611d8c57805466ffffffffff00001916601089901b66ffffffffff000016179055600454955f198714611d8c577f69de717cc4cf87fb2f5d94b043c03b6e76e5673b64f842900d2178f61d846a5f978460809801958660045560405190611d1882611f31565b8b8252848201938985526040830193169687845260608301925f8452895f526003875260405f20905181550193511666ff00000000000065ffffffffff008554945160081b169251151560301b169266ffffffffffffff1916171717905560405194855284015260408301526060820152a2005b634e487b7160e01b5f52601160045260245ffd5b604051633249a22160e21b8152600490fd5b50818987015460401c1682841611611c31565b5081898701541682861611611c2a565b604051635e68ac9f60e11b8152600490fd5b9050421089611bd4565b60405163921c7d5f60e01b8152600490fd5b60405163ce17406560e01b8152600490fd5b6313a334ad60e11b8152600490fd5b6004359060ff821682036109a157565b600435906001600160a01b03821682036109a157565b9060088210156113ae5752565b64ffffffffff60408092611e6c858251611e4a565b60ff6020820151166020860152015116910152565b346109a1575f3660031901126109a157602060405160328152f35b906001600160401b03809216603202918216918203611d8c57565b906001600160401b03809216600a02918216918203611d8c57565b9190916001600160401b0380809416911602918216918203611d8c57565b6001600160401b039182169082160391908211611d8c57565b9067ffffffffffffffff60401b82549160401b169067ffffffffffffffff60401b1916179055565b608081019081106001600160401b0382111761026f57604052565b606081019081106001600160401b0382111761026f57604052565b6101c081019081106001600160401b0382111761026f57604052565b15611f8a57565b60405162461bcd60e51b81526020600482015260096024820152682737ba1030b236b4b760b91b6044820152606490fd5b60405190611fc882611f4c565b5f6040838281528260208201520152565b60088210156113ae5752565b63ffffffff809116908114611d8c5760010190565b9190916001600160401b0380809416911601918211611d8c57565b60ff1660ff8114611d8c5760010190565b9060648110156120375760051b0190565b634e487b7160e01b5f52603260045260245ffd5b805f5260016020526040805f2064ffffffffff91824216600183019184835460c01c168203858111611d8c57851694601e861061223357601e857f31b939135aee35b002b837bfc9c0b91c4f0cd4dfffff6e2197acce67cb4523669761215b612155888761214c600260809d016121126120ea6120de6001600160401b039c8d9c8d80988754901c169b0416809a611ed2565b858b5460a81c16611ffa565b895467ffffffffffffffff60a81b191660a89190911b67ffffffffffffffff60a81b16178955565b5495612123818f8986911c16611ed2565b9683612133865499828b16611ffa565b166001600160401b03198099161780955560c01c611ed2565b91891c16611ffa565b88611f09565b8154673fffffffffffffff91818386819460a81c1611612210575b5088548286821611612204575b5050508654908382871c16116121d7575b50855464ffffffffff60c01b191660c086901b64ffffffffff60c01b161786555460a81c16935482519485528181166020860152821c16908301526060820152a2565b6fffffffffffffffff000000000000000019166f3fffffffffffffff00000000000000001786555f612194565b16178755805f80612183565b67ffffffffffffffff60a81b1916673fffffffffffffff60a81b1784555f612176565b50505050505050565b90604051906020820192835260ff60f81b9060f81b1660408201526021815261226481611f4c565b51902090565b90600f63ffffffff80931602918216918203611d8c57565b90600a63ffffffff80931602918216918203611d8c57565b60031b906407fffffff863fffffff8831692168203611d8c57565b63ffffffff9182169082160391908211611d8c57565b91909163ffffffff80809416911601918211611d8c5756fea26469706673582212204f2a24b6da2a6a3f301b2f4293828a103de7fdca21e0ede1bb9a9d97e7a738fb64736f6c63430008180033",
+  "nonce": "0x6f",
+  "chainId": "0xc488"
+}
+ABI: [
+  {
+    "type": "constructor",
+    "inputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "RESOURCE_PER_TICK_PER_LEVEL",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "TICK_INTERVAL",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint40",
+        "internalType": "uint40"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "UPGRADE_DURATION",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint40",
+        "internalType": "uint40"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "UPGRADE_GOLD_BASE",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "UPGRADE_STONE_BASE",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "UPGRADE_WOOD_BASE",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "applyRaidResult",
+    "inputs": [
+      {
+        "name": "attacker",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "defender",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "lootGold",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "lootWood",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "lootStone",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "attackerWon",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "attackContract",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "bases",
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "owner",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "initialized",
+        "type": "bool",
+        "internalType": "bool"
+      },
+      {
+        "name": "gold",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "wood",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "stone",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "attackPower",
+        "type": "uint32",
+        "internalType": "uint32"
+      },
+      {
+        "name": "defensePower",
+        "type": "uint32",
+        "internalType": "uint32"
+      },
+      {
+        "name": "lastTickAt",
+        "type": "uint40",
+        "internalType": "uint40"
+      },
+      {
+        "name": "totalWins",
+        "type": "uint32",
+        "internalType": "uint32"
+      },
+      {
+        "name": "totalLosses",
+        "type": "uint32",
+        "internalType": "uint32"
+      },
+      {
+        "name": "goldRate",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "woodRate",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "stoneRate",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "buildingCount",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "buildings",
+    "inputs": [
+      {
+        "name": "",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "buildingType",
+        "type": "uint8",
+        "internalType": "enum BaseContract.BuildingType"
+      },
+      {
+        "name": "level",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "upgradeEndsAt",
+        "type": "uint40",
+        "internalType": "uint40"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "claimUpgrade",
+    "inputs": [
+      {
+        "name": "jobId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "collectResources",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "getAllBuildings",
+    "inputs": [
+      {
+        "name": "player",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "result",
+        "type": "tuple[100]",
+        "internalType": "struct BaseContract.Building[100]",
+        "components": [
+          {
+            "name": "buildingType",
+            "type": "uint8",
+            "internalType": "enum BaseContract.BuildingType"
+          },
+          {
+            "name": "level",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "upgradeEndsAt",
+            "type": "uint40",
+            "internalType": "uint40"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getBase",
+    "inputs": [
+      {
+        "name": "player",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct BaseContract.Base",
+        "components": [
+          {
+            "name": "owner",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "initialized",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "gold",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "wood",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "stone",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "attackPower",
+            "type": "uint32",
+            "internalType": "uint32"
+          },
+          {
+            "name": "defensePower",
+            "type": "uint32",
+            "internalType": "uint32"
+          },
+          {
+            "name": "lastTickAt",
+            "type": "uint40",
+            "internalType": "uint40"
+          },
+          {
+            "name": "totalWins",
+            "type": "uint32",
+            "internalType": "uint32"
+          },
+          {
+            "name": "totalLosses",
+            "type": "uint32",
+            "internalType": "uint32"
+          },
+          {
+            "name": "goldRate",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "woodRate",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "stoneRate",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "buildingCount",
+            "type": "uint8",
+            "internalType": "uint8"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getBaseStats",
+    "inputs": [
+      {
+        "name": "player",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "attack",
+        "type": "uint32",
+        "internalType": "uint32"
+      },
+      {
+        "name": "defense",
+        "type": "uint32",
+        "internalType": "uint32"
+      },
+      {
+        "name": "gold",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "wood",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "stone",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getBuilding",
+    "inputs": [
+      {
+        "name": "player",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "slot",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct BaseContract.Building",
+        "components": [
+          {
+            "name": "buildingType",
+            "type": "uint8",
+            "internalType": "enum BaseContract.BuildingType"
+          },
+          {
+            "name": "level",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "upgradeEndsAt",
+            "type": "uint40",
+            "internalType": "uint40"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getUpgradeJob",
+    "inputs": [
+      {
+        "name": "jobId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct BaseContract.UpgradeJob",
+        "components": [
+          {
+            "name": "baseId",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "slot",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "endsAt",
+            "type": "uint40",
+            "internalType": "uint40"
+          },
+          {
+            "name": "claimed",
+            "type": "bool",
+            "internalType": "bool"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "hasBase",
+    "inputs": [
+      {
+        "name": "player",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "initializeBase",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "owner",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "ownerToBaseId",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "placeBuilding",
+    "inputs": [
+      {
+        "name": "slot",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "buildingType",
+        "type": "uint8",
+        "internalType": "enum BaseContract.BuildingType"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "resourceVault",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "setAttackContract",
+    "inputs": [
+      {
+        "name": "_attackContract",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+Warning: To broadcast this transaction, add --broadcast to the 
+previous command. See forge create --help for more.
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setResourceVault",
+    "inputs": [
+      {
+        "name": "_resourceVault",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "startUpgrade",
+    "inputs": [
+      {
+        "name": "slot",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "tickResourcesFor",
+    "inputs": [
+      {
+        "name": "player",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "upgradeJobs",
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "baseId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "slot",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "endsAt",
+        "type": "uint40",
+        "internalType": "uint40"
+      },
+      {
+        "name": "claimed",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "BaseInitialized",
+    "inputs": [
+      {
+        "name": "owner",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "baseId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "BaseStatsUpdated",
+    "inputs": [
+      {
+        "name": "baseId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "attackPower",
+        "type": "uint32",
+        "indexed": false,
+        "internalType": "uint32"
+      },
+      {
+        "name": "defensePower",
+        "type": "uint32",
+        "indexed": false,
+        "internalType": "uint32"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "BuildingPlaced",
+    "inputs": [
+      {
+        "name": "baseId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "slot",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      },
+      {
+        "name": "buildingType",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "enum BaseContract.BuildingType"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "ResourceTick",
+    "inputs": [
+      {
+        "name": "baseId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "gold",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
+      },
+      {
+        "name": "wood",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
+      },
+      {
+        "name": "stone",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
+      },
+      {
+        "name": "timestamp",
+        "type": "uint40",
+        "indexed": false,
+        "internalType": "uint40"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "ResourcesCollected",
+    "inputs": [
+      {
+        "name": "collector",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "baseId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "gold",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
+      },
+      {
+        "name": "wood",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
+      },
+      {
+        "name": "stone",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "UpgradeComplete",
+    "inputs": [
+      {
+        "name": "baseId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "slot",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      },
+      {
+        "name": "newLevel",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      },
+      {
+        "name": "jobId",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "UpgradeStarted",
+    "inputs": [
+      {
+        "name": "baseId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "slot",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      },
+      {
+        "name": "newLevel",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      },
+      {
+        "name": "endsAt",
+        "type": "uint40",
+        "indexed": false,
+        "internalType": "uint40"
+      },
+      {
+        "name": "jobId",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "AlreadyInitialized",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "CooldownActive",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InsufficientResources",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidSlot",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "MaxLevelReached",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NotBaseOwner",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NotInitialized",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "OnlyAttackContract",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "SlotEmpty",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "SlotOccupied",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "UpgradeAlreadyInProgress",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "UpgradeNotComplete",
+    "inputs": []
+  }
+]
+

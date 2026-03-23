@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+.npm
+.DS_Store
+
+# Build artifacts
+dist/
+out/
+cache/
+artifacts/
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vite
+*.tsbuildinfo
+*.log

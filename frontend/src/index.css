@@ -1,0 +1,324 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global text rendering */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: #080810;
+  color: #F0EEFF;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow: hidden;
+}
+
+/* All headings use fantasy font with gradient */
+.heading-gradient {
+  background: linear-gradient(135deg, #F0EEFF 0%, #C084FC 50%, #9B5DE5 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Readable mono text — not too dim */
+.mono-readable {
+  color: #A09DC0;
+  font-family: "Space Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+/* Resource values — bright teal, easy to scan */
+.resource-value {
+  color: #00F5D4;
+  font-family: "Space Mono", monospace;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 12px rgba(0, 245, 212, 0.4);
+}
+
+/* Event text — easy to read on dark background */
+.event-text {
+  color: #D4D0F0;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* Labels — small but readable */
+.label-text {
+  color: #6B68A0;
+  font-family: "Space Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* Highlighted addresses */
+.address-text {
+  color: #00F5D4;
+  font-family: "Space Mono", monospace;
+  font-size: 10px;
+}
+
+/* Stat values — large and punchy */
+.stat-value-teal { color: #00F5D4; text-shadow: 0 0 10px rgba(0,245,212,0.5); }
+.stat-value-pink { color: #F72585; text-shadow: 0 0 10px rgba(247,37,133,0.4); }
+.stat-value-gold { color: #FFD60A; text-shadow: 0 0 10px rgba(255,214,10,0.4); }
+
+/* Navigation items */
+.nav-item-active {
+  background: linear-gradient(135deg, rgba(155,93,229,0.2), rgba(247,37,133,0.1));
+  border: 1px solid rgba(155,93,229,0.4);
+  color: #C084FC;
+}
+.nav-item {
+  color: #6B68A0;
+  transition: all 0.2s ease;
+}
+.nav-item:hover {
+  color: #A09DC0;
+  background: rgba(255,255,255,0.04);
+}
+
+/* Card surfaces */
+.card-surface {
+  background: #0F0F1E;
+  border: 1px solid #2A2A45;
+  border-radius: 12px;
+}
+.card-surface:hover {
+  border-color: rgba(155,93,229,0.4);
+}
+
+/* Progress bar glow */
+.progress-glow {
+  background: linear-gradient(90deg, #9B5DE5, #F72585);
+  box-shadow: 0 0 8px rgba(155,93,229,0.6);
+}
+
+/* Section headers */
+.section-header {
+  font-family: "Cinzel", serif;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.nebula-bg {
+    background: radial-gradient(circle at 20% 30%, rgba(123, 63, 228, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(0, 242, 255, 0.1) 0%, transparent 40%),
+                #0A0A0F;
+}
+
+.castle-glow {
+    filter: drop-shadow(0 0 20px rgba(123, 63, 228, 0.4));
+}
+
+.text-glow {
+    text-shadow: 0 0 15px rgba(123, 63, 228, 0.6);
+}
+
+/* Continuous marquee scroll animation */
+@keyframes marquee-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 18s linear infinite;
+}
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* Pulsing glow on ENTER THE SIEGE button */
+@keyframes btn-pulse {
+  0%   { box-shadow: 0 0 0px rgba(123, 63, 228, 0); }
+  50%  { box-shadow: 0 0 28px rgba(123, 63, 228, 0.7), 0 0 60px rgba(228, 0, 122, 0.3); }
+  100% { box-shadow: 0 0 0px rgba(123, 63, 228, 0); }
+}
+.btn-siege {
+  background: linear-gradient(#0A0A0F, #0A0A0F) padding-box,
+              linear-gradient(to right, #7B3FE4, #E4007A) border-box;
+  border: 2px solid transparent;
+  animation: btn-pulse 2.5s ease-in-out infinite;
+}
+.btn-siege:hover {
+  animation: none;
+  box-shadow: 0 0 20px rgba(123, 63, 228, 0.4);
+}
+
+.small-caps {
+  font-variant: all-small-caps;
+}
+
+.glow-purple {
+  box-shadow: 0 0 15px rgba(123, 63, 228, 0.4);
+}
+
+/* CHANGE 1: Resource tick-up animation */
+@keyframes countUp {
+  from { opacity: 0.4; transform: translateY(4px) scale(0.97); }
+  to   { opacity: 1;   transform: translateY(0)  scale(1); }
+}
+.resource-tick {
+  animation: countUp 0.4s ease forwards;
+}
+
+/* CHANGE 2: Reactivity LIVE badge pulse */
+@keyframes live-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.5); }
+  70%  { box-shadow: 0 0 0 6px rgba(45, 212, 191, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0); }
+}
+.live-dot { animation: live-pulse 1.8s infinite; }
+
+/* CHANGE 3: Live event slide-in from right */
+@keyframes slideInEvent {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.event-new { animation: slideInEvent 0.35s ease forwards; }
+
+/* CHANGE 4: Upgrade progress bar animated fill */
+@keyframes progressFill {
+  from { width: 0%; }
+  to   { width: var(--progress); }
+}
+.progress-bar-fill {
+  animation: progressFill 1.2s ease forwards;
+}
+
+/* CHANGE 5: Incoming raid alert pulse border */
+@keyframes raidBorderPulse {
+  0%   { border-color: rgba(228, 0, 122, 0.4); box-shadow: 0 0 0 0 rgba(228, 0, 122, 0.3); }
+  50%  { border-color: rgba(228, 0, 122, 1);   box-shadow: 0 0 16px 4px rgba(228, 0, 122, 0.4); }
+  100% { border-color: rgba(228, 0, 122, 0.4); box-shadow: 0 0 0 0 rgba(228, 0, 122, 0.3); }
+}
+.raid-alert-border { animation: raidBorderPulse 1.5s ease-in-out infinite; }
+
+/* CHANGE 6: Collect Resources button glow on hover */
+.collect-btn:hover {
+  border-color: #2dd4bf !important;
+  color: #2dd4bf !important;
+  box-shadow: 0 0 12px rgba(45, 212, 191, 0.3);
+}
+
+/* CHANGE 7: Block number tick */
+@keyframes blockTick {
+  0%   { color: #2dd4bf; }
+  50%  { color: #ffffff; }
+  100% { color: #2dd4bf; }
+}
+.block-flash { animation: blockTick 0.4s ease; }
+
+/* Live dot pulse */
+@keyframes pulse-teal {
+  0%   { opacity: 1; transform: scale(1); }
+  50%  { opacity: 0.4; transform: scale(1.3); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.animate-pulse-teal { animation: pulse-teal 1.5s infinite ease-in-out; }
+
+/* Stat card fade in */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.stat-card {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+/* Block counter tick animation */
+@keyframes tick {
+  0%   { opacity: 0.4; transform: scale(0.96); }
+  50%  { opacity: 1;   transform: scale(1.02); }
+  100% { opacity: 0.8; transform: scale(1); }
+}
+.block-tick { animation: tick 1s ease-in-out; }
+
+.marquee {
+    white-space: nowrap;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.btn-ghost-gradient {
+    background: linear-gradient(#0A0A0F, #0A0A0F) padding-box,
+                linear-gradient(to right, #7B3FE4, #E4007A) border-box;
+    border: 2px solid transparent;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-ghost-gradient:hover {
+    box-shadow: 0 0 15px rgba(123, 63, 228, 0.3);
+    background: linear-gradient(#11111d, #11111d) padding-box,
+                linear-gradient(to right, #7B3FE4, #E4007A) border-box;
+}
+
+.glass {
+  background-color: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background-color: rgba(10, 10, 15, 0.8);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 2rem;
+  padding: 2rem;
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.7);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+.glass-card:hover {
+  background-color: rgba(20, 20, 30, 0.9);
+  border-color: rgba(123, 63, 228, 0.4);
+  transform: translateY(-8px);
+  box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.9), 0 0 40px rgba(123, 63, 228, 0.15);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.05);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(123, 63, 228, 0.2);
+}
