@@ -474,7 +474,7 @@ export default function Landing() {
       </header>
 
       {/* MAIN HERO */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center relative w-full px-3 md:px-6 text-center">
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center w-full px-3 md:px-6 text-center">
         <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
           <div 
             className="relative w-full max-w-4xl aspect-video bg-center bg-no-repeat bg-contain"
