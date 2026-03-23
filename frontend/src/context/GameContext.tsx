@@ -50,6 +50,7 @@ interface GameContextType {
   isLoading: boolean;
   incomingRaid: IncomingRaid | null;
   setIncomingRaid: React.Dispatch<React.SetStateAction<IncomingRaid | null>>;
+  isReactivityLive: boolean;
 }
 
 const ARENA_ADDRESSES = [
@@ -109,11 +110,34 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     vanguard: 0n,
     timestamp: Date.now()
   });
+  const [isReactivityLive, setIsReactivityLive] = useState(false);
 
   // REAL DATA HOOKS
   const { buildings: onChainBuildings, refetch: refetchBuildings, isLoading: loadingBuildings } = useAllBuildings(address);
   const { base: onChainBase, refetch: refetchBase, isLoading: loadingBase } = useBase(address);
   const [base, setBase] = useState<BaseData | undefined>(undefined);
+
+  // Connection tracker for Reactivity SDK
+  useEffect(() => {
+    const checkConnection = () => {
+      try {
+        const ws = new WebSocket('wss://dream-rpc.somnia.network/ws');
+        ws.onopen = () => {
+          setIsReactivityLive(true);
+          ws.close();
+        };
+        ws.onerror = () => {
+          setIsReactivityLive(false);
+        };
+        ws.onclose = () => {};
+      } catch (e) {
+        setIsReactivityLive(false);
+      }
+    };
+    checkConnection();
+    const interval = setInterval(checkConnection, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Sync base state with on-chain hook
   useEffect(() => {
@@ -357,6 +381,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       isLoading: loadingBuildings || loadingBase,
       incomingRaid,
       setIncomingRaid,
+      isReactivityLive,
     }}>
       {children}
     </GameContext.Provider>

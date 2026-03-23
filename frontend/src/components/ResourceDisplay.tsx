@@ -7,7 +7,7 @@ import { CONTRACT_ADDRESSES, RESOURCE_VAULT_ABI, BASE_CONTRACT_ABI } from '../co
 
 const ResourceDisplay = () => {
   const { address } = useAccount();
-  const { resources, base } = useGame();
+  const { resources, isReactivityLive } = useGame();
   
   // Simulate tick-up for visual flair on load or updates
   const [tickKey, setTickKey] = useState(0);
@@ -46,9 +46,9 @@ const ResourceDisplay = () => {
       ))}
 
       <div className="flex items-center gap-2 shrink-0">
-        <span className="h-1.5 w-1.5 rounded-full bg-accent-teal live-dot"></span>
-        <span className="text-[9px] font-mono text-accent-teal uppercase tracking-widest leading-none">
-          Reactivity Live
+        <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${isReactivityLive ? 'bg-accent-teal live-dot' : 'bg-red-500'}`}></span>
+        <span className={`text-[9px] font-mono uppercase tracking-widest leading-none ${isReactivityLive ? 'text-accent-teal' : 'text-red-400'}`}>
+          {isReactivityLive ? 'Reactivity Live' : 'Connecting...'}
         </span>
       </div>
     </div>
