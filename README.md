@@ -1,52 +1,53 @@
 # 🏰 DreamSiege
 
-A tactical, decentralized empire-building game built on the **Somnia Shannon Testnet**.
+**DreamSiege** is a real-time, on-chain PvP strategy game built on the **Somnia Network**. Players build powerful empires, manage decentralized resources, and engage in tactical sieges against other commanders.
 
-![Somnia](https://img.shields.io/badge/Blockchain-Somnia-blue)
-![React](https://img.shields.io/badge/Frontend-React-61DAFB)
-![Vite](https://img.shields.io/badge/Build-Vite-646CFF)
-
-## 🌌 Overview
-
-DreamSiege is a high-stakes strategy game where players register unique Empires, build strategic infrastructure, and raid opponents for glory and resources. Powered by the **Somnia Reactivity SDK**, the game features real-time resource generation and low-latency battle synchronization.
+---
 
 ## 🚀 Key Features
 
-### 🏛️ Decentralized Empire Registry
-- Securely register and brand your unique Empire on-chain.
-- Dynamic naming and badge systems.
-
-### 🏗️ Strategic Building Grid
-- Manage a 100-slot grid with specialized structures:
-  - **Mines/Lumber Mills/Quarries**: Automated resource production.
-  - **Barracks/Wall/Tower**: Tactical offensive and defensive power.
-  - **Resource Vault**: High-security storage for accumulated wealth.
-
-### ⚔️ PvP Arena & Siege System
-- Real-time raiding system with tactical win probabilities.
-- **Interception Mechanic**: Defenders can manually intercept incoming raids to gain the upper hand.
-- **Global Battle Sync**: Decentralized battle logs that update simultaneously for both participants, regardless of their current page.
-
-### ⚡ Real-time Reactivity
-- Powered by the Somnia Reactivity SDK for instant state updates.
-- Automated resource ticking and collection systems.
+- **Somnia Reactivity SDK Integration**: Real-time state updates and low-latency game events.
+- **Real-time Battle Notifications**: Instant alerts for incoming raids and battle resolutions across all players.
+- **Decentralized Resource Management**: Tick-based generation of Credits, Biomass, and Minera via the on-chain Resource Vault.
+- **Strategic Empire Building**: A 100-slot grid for infrastructure development, fortification, and production.
+- **Live Leaderboard**: Track the most successful commanders on the Somnia Shannon Testnet.
 
 ## 🛠️ Technology Stack
 
-- **Smart Contracts**: Solidity (SomniaShannon Testnet)
+- **Smart Contracts**: Solidity (deployed on Somnia Shannon Testnet)
 - **Frontend**: React, TypeScript, Tailwind CSS
-- **Reactivity**: Somnia Reactivity SDK (@somnia-chain/reactivity)
+- **Reactivity Layer**: Somnia Reactivity SDK (@somnia-chain/reactivity)
 - **Blockchain Interface**: Viem, Wagmi, RainbowKit
-- **Build Tool**: Vite
+- **Build System**: Vite
 
-## 📦 Installation & Setup
+---
+
+## 📄 Contract Addresses (Somnia Shannon Testnet)
+
+| Contract | Address |
+| :--- | :--- |
+| **Empire Registry** | `0x54668Bc9849202167d4F009941da79D3A86326E0` |
+| **Base Contract** | `0xf3085Cd3d09aE879e6584fF38F142646c8E4eC9F` |
+| **PvP Arena** | `0xea032BAdf8714eb67425265fc8716A54Ab31E49F` |
+| **Resource Vault** | `0x8992A7216A6Ce524dA31E4c9A6469C9F94a6E4E2` |
+| **Leaderboard** | `0x24C16ce524DA31E4c9a646ac9F94a6e4E22468bc` |
+
+---
+
+## 📦 Local Development
+
+### Prerequisites
+- Node.js (v18+)
+- A web3 wallet (e.g., MetaMask) configured for Somnia Shannon Testnet
+
+### Installation
 
 1. **Clone the repository**:
    ```bash
    git clone https://github.com/Jayanng/dreamseige.git
    ```
 
-2. **Navigate to the frontend**:
+2. **Navigate to the frontend folder**:
    ```bash
    cd frontend
    ```
@@ -61,13 +62,9 @@ DreamSiege is a high-stakes strategy game where players register unique Empires,
    npm run dev
    ```
 
-## 📜 Contract Architecture
-
-- **BaseContract**: Handles building placement, upgrades, and core empire stats.
-- **ResourceVault**: Manages the decentralized treasury and resource generation.
-- **PvPArena**: Orchestrates combat logic, interceptions, and raid resolutions.
-- **Leaderboard**: Tracks the top commanders in real-time.
+5. **Open your browser**:
+   Navigate to [http://localhost:5173](http://localhost:5173) and connect your wallet.
 
 ---
 
-Built with ❤️ for the Somnia Shannon Testnet.
+Built for the **Somnia Network** 🧬
