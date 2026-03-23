@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt, useReadContract, useBlockNumber } from 'wagmi';
@@ -6,7 +6,6 @@ import { useConnectModal } from '@rainbow-me/rainbowkit';
 import ConnectWalletButton from '../components/ConnectWalletButton';
 import { CONTRACT_ADDRESSES, BASE_CONTRACT_ABI, LEADERBOARD_CONTRACT_ABI } from '../constants/contracts';
 import * as THREE from 'three';
-import { useRef, useEffect } from 'react';
 
 const ParticleField = () => {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -17,13 +16,31 @@ const ParticleField = () => {
     // Scene setup
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    const renderer = new THREE.WebGLRenderer({
+      alpha: true,
+      antialias: false,
+      powerPreference: 'low-power'
+    });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setClearColor(0x000000, 0);
     mountRef.current.appendChild(renderer.domElement);
 
+    // Canvas explicit styling
+    renderer.domElement.style.position = 'fixed';
+    renderer.domElement.style.top = '0';
+    renderer.domElement.style.left = '0';
+    renderer.domElement.style.width = '100%';
+    renderer.domElement.style.height = '100%';
+    renderer.domElement.style.pointerEvents = 'none';
+    renderer.domElement.style.zIndex = '1';
+    renderer.domElement.style.willChange = 'transform';
+    renderer.domElement.style.transform = 'translateZ(0)';
+
     // Create particles
-    const particleCount = 1500;
+    const particleCount = 400;
+    console.log('[ParticleField] Three.js initialized, particles:', particleCount);
+    
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
 
@@ -35,9 +52,9 @@ const ParticleField = () => {
     ];
 
     for (let i = 0; i < particleCount; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 100;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 100;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 100;
+      positions[i * 3] = (Math.random() - 0.5) * 80;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 80;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 50;
 
       const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
       colors[i * 3] = color.r;
@@ -49,18 +66,34 @@ const ParticleField = () => {
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
+    // Create a circular sprite texture
+    const canvas = document.createElement('canvas');
+    canvas.width = 32;
+    canvas.height = 32;
+    const ctx = canvas.getContext('2d')!;
+    const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+    gradient.addColorStop(0, 'rgba(255,255,255,1)');
+    gradient.addColorStop(0.3, 'rgba(255,255,255,0.8)');
+    gradient.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 32, 32);
+    const texture = new THREE.CanvasTexture(canvas);
+
     const material = new THREE.PointsMaterial({
-      size: 0.3,
+      size: 0.4,
       vertexColors: true,
       transparent: true,
-      opacity: 0.8,
+      opacity: 0.9,
       sizeAttenuation: true,
+      map: texture,
+      alphaTest: 0.01,
+      depthWrite: false,
     });
 
     const particles = new THREE.Points(geometry, material);
     scene.add(particles);
 
-    camera.position.z = 30;
+    camera.position.z = 25;
 
     // Mouse interaction
     let mouseX = 0;
@@ -81,20 +114,27 @@ const ParticleField = () => {
 
     // Animation loop
     let animationId: number;
-    const animate = () => {
+    let lastTime = 0;
+    const targetFPS = 24;
+    const frameInterval = 1000 / targetFPS;
+
+    const animate = (currentTime: number) => {
       animationId = requestAnimationFrame(animate);
+      const delta = currentTime - lastTime;
+      if (delta < frameInterval) return;
+      lastTime = currentTime - (delta % frameInterval);
 
-      particles.rotation.x += 0.0003;
-      particles.rotation.y += 0.0005;
+      particles.rotation.x += 0.00015;
+      particles.rotation.y += 0.00025;
 
-      // Smooth camera movement following mouse
-      camera.position.x += (mouseX * 3 - camera.position.x) * 0.02;
-      camera.position.y += (-mouseY * 3 - camera.position.y) * 0.02;
+      // Smooth camera movement following mouse (subtle)
+      camera.position.x += (mouseX * 1.5 - camera.position.x) * 0.01;
+      camera.position.y += (-mouseY * 1.5 - camera.position.y) * 0.01;
       camera.lookAt(scene.position);
 
       renderer.render(scene, camera);
     };
-    animate();
+    animate(0);
 
     // Cleanup
     return () => {
@@ -114,7 +154,7 @@ const ParticleField = () => {
     <div
       ref={mountRef}
       className="fixed inset-0 pointer-events-none"
-      style={{ zIndex: 0 }}
+      style={{ zIndex: 1 }}
     />
   );
 };
@@ -199,7 +239,7 @@ export default function Landing() {
   const isDeploying = isPending || isConfirming;
 
   return (
-    <div className="relative min-h-screen w-full nebula-bg flex flex-col items-center justify-between overflow-hidden font-display text-slate-100 antialiased">
+    <div className="relative min-h-screen w-full bg-transparent flex flex-col items-center justify-between overflow-hidden font-display text-slate-100 antialiased">
       <ParticleField />
       <style>{`
         .nebula-bg {
@@ -219,6 +259,9 @@ export default function Landing() {
           display: flex;
           width: max-content;
           animation: marquee-scroll 18s linear infinite;
+          will-change: transform;
+          transform: translateZ(0);
+          backface-visibility: hidden;
         }
         .marquee-track:hover {
           animation-play-state: paused;
@@ -420,7 +463,7 @@ export default function Landing() {
       </div>
 
       {/* HEADER */}
-      <header className="relative z-10 w-full max-w-7xl px-3 py-4 md:px-6 md:py-6 flex justify-between items-center relative">
+      <header className="relative z-10 w-full max-w-7xl px-3 py-4 md:px-6 md:py-6 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <span className="material-symbols-outlined text-primary text-3xl">fort</span>
           <h2 className="font-fantasy text-2xl font-black bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent tracking-wider">
@@ -524,7 +567,10 @@ export default function Landing() {
           </div>
 
           <div className="overflow-hidden flex-1 scale-x-100">
-            <div className="marquee-track font-mono text-sm text-slate-400 tracking-tight">
+            <div 
+              className="marquee-track font-mono text-sm text-slate-400 tracking-tight"
+              style={{ willChange: 'transform' }}
+            >
               {/* Mapping identical content for seamless loop */}
               {[1, 2].map((i) => (
                 <React.Fragment key={i}>
