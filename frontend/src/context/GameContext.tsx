@@ -119,24 +119,48 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Connection tracker for Reactivity SDK
   useEffect(() => {
-    const checkConnection = () => {
+    let ws: WebSocket | null = null;
+    let reconnectTimer: ReturnType<typeof setTimeout>;
+
+    const connect = () => {
       try {
-        const ws = new WebSocket('wss://dream-rpc.somnia.network/ws');
+        ws = new WebSocket('wss://dream-rpc.somnia.network/ws');
+
         ws.onopen = () => {
           setIsReactivityLive(true);
-          ws.close();
         };
+
+        ws.onclose = () => {
+          setIsReactivityLive(false);
+          // Try to reconnect after 5 seconds
+          reconnectTimer = setTimeout(connect, 5000);
+        };
+
         ws.onerror = () => {
           setIsReactivityLive(false);
+          ws?.close();
         };
-        ws.onclose = () => {};
       } catch (e) {
         setIsReactivityLive(false);
+        reconnectTimer = setTimeout(connect, 5000);
       }
     };
-    checkConnection();
-    const interval = setInterval(checkConnection, 30000);
-    return () => clearInterval(interval);
+
+    connect();
+
+    // Also listen to browser online/offline events
+    const handleOffline = () => setIsReactivityLive(false);
+    const handleOnline = () => connect();
+
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline);
+
+    return () => {
+      ws?.close();
+      clearTimeout(reconnectTimer);
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('online', handleOnline);
+    };
   }, []);
 
   // Sync base state with on-chain hook
