@@ -5,6 +5,119 @@ import { useAccount, useWriteContract, useWaitForTransactionReceipt, useReadCont
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import ConnectWalletButton from '../components/ConnectWalletButton';
 import { CONTRACT_ADDRESSES, BASE_CONTRACT_ABI, LEADERBOARD_CONTRACT_ABI } from '../constants/contracts';
+import * as THREE from 'three';
+import { useRef, useEffect } from 'react';
+
+const ParticleField = () => {
+  const mountRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!mountRef.current) return;
+
+    // Scene setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    mountRef.current.appendChild(renderer.domElement);
+
+    // Create particles
+    const particleCount = 1500;
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+
+    const colorPalette = [
+      new THREE.Color('#9B5DE5'), // purple
+      new THREE.Color('#F72585'), // pink
+      new THREE.Color('#00F5D4'), // teal
+      new THREE.Color('#FFD60A'), // yellow
+    ];
+
+    for (let i = 0; i < particleCount; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 100;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 100;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 100;
+
+      const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+      colors[i * 3] = color.r;
+      colors[i * 3 + 1] = color.g;
+      colors[i * 3 + 2] = color.b;
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    const material = new THREE.PointsMaterial({
+      size: 0.3,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.8,
+      sizeAttenuation: true,
+    });
+
+    const particles = new THREE.Points(geometry, material);
+    scene.add(particles);
+
+    camera.position.z = 30;
+
+    // Mouse interaction
+    let mouseX = 0;
+    let mouseY = 0;
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+      mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+
+    // Handle resize
+    const handleResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+    window.addEventListener('resize', handleResize);
+
+    // Animation loop
+    let animationId: number;
+    const animate = () => {
+      animationId = requestAnimationFrame(animate);
+
+      particles.rotation.x += 0.0003;
+      particles.rotation.y += 0.0005;
+
+      // Smooth camera movement following mouse
+      camera.position.x += (mouseX * 3 - camera.position.x) * 0.02;
+      camera.position.y += (-mouseY * 3 - camera.position.y) * 0.02;
+      camera.lookAt(scene.position);
+
+      renderer.render(scene, camera);
+    };
+    animate();
+
+    // Cleanup
+    return () => {
+      cancelAnimationFrame(animationId);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('resize', handleResize);
+      if (mountRef.current) {
+        mountRef.current.removeChild(renderer.domElement);
+      }
+      renderer.dispose();
+      geometry.dispose();
+      material.dispose();
+    };
+  }, []);
+
+  return (
+    <div
+      ref={mountRef}
+      className="fixed inset-0 pointer-events-none"
+      style={{ zIndex: 0 }}
+    />
+  );
+};
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -87,6 +200,7 @@ export default function Landing() {
 
   return (
     <div className="relative min-h-screen w-full nebula-bg flex flex-col items-center justify-between overflow-hidden font-display text-slate-100 antialiased">
+      <ParticleField />
       <style>{`
         .nebula-bg {
           background: radial-gradient(circle at 20% 30%, rgba(123, 63, 228, 0.15) 0%, transparent 40%),
@@ -306,7 +420,7 @@ export default function Landing() {
       </div>
 
       {/* HEADER */}
-      <header className="w-full max-w-7xl px-3 py-4 md:px-6 md:py-6 flex justify-between items-center z-50 relative">
+      <header className="relative z-10 w-full max-w-7xl px-3 py-4 md:px-6 md:py-6 flex justify-between items-center relative">
         <div className="flex items-center gap-2">
           <span className="material-symbols-outlined text-primary text-3xl">fort</span>
           <h2 className="font-fantasy text-2xl font-black bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent tracking-wider">
@@ -317,7 +431,7 @@ export default function Landing() {
       </header>
 
       {/* MAIN HERO */}
-      <main className="flex-1 flex flex-col items-center justify-center relative z-10 w-full px-3 md:px-6 text-center">
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center relative w-full px-3 md:px-6 text-center">
         <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
           <div 
             className="relative w-full max-w-4xl aspect-video bg-center bg-no-repeat bg-contain"
@@ -402,7 +516,7 @@ export default function Landing() {
       </main>
 
       {/* FOOTER */}
-      <footer className="w-full bg-background-dark/80 backdrop-blur-md border-t border-slate-800/50 py-3 px-3 md:px-6 md:py-4 z-50 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4">
+      <footer className="relative z-10 w-full bg-background-dark/80 backdrop-blur-md border-t border-slate-800/50 py-3 px-3 md:px-6 md:py-4 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4">
         <div className="flex items-center gap-4 flex-1 overflow-hidden">
           <div className="flex items-center gap-2 bg-slate-900 px-3 py-1 rounded-full border border-slate-800 shrink-0">
             <span className="w-2 h-2 rounded-full bg-nebula-teal animate-pulse-teal"></span>
