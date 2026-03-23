@@ -19,3 +19,8 @@ artifacts/
 # Vite
 *.tsbuildinfo
 *.log
+
+# Security
+*.pem
+*.key
+test_rsa_privkey*
