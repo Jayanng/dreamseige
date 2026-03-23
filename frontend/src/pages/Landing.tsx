@@ -16,7 +16,7 @@ export default function Landing() {
     address: CONTRACT_ADDRESSES.LEADERBOARD_CONTRACT as `0x${string}`,
     abi: LEADERBOARD_CONTRACT_ABI,
     functionName: 'getTopPlayers',
-    args: [50n],
+    args: [Number(50)],
   });
 
   const empiresActive = topPlayersData ? (topPlayersData as any)[0].length : 0;
