@@ -34,7 +34,7 @@ The first is detecting incoming attacks. When an attacker submits their siege tr
 
 The second is syncing battle results to both players at the same moment. When a battle is resolved on-chain — whether by the attacker claiming loot, the defender intercepting, or the auto-resolve timer firing — the contract emits a `BattleResolved` event. The `subscribeToAllResolutions` listener in `GameContext.tsx` receives this push on both players' browsers simultaneously. It determines whether the connected wallet is the winner or the loser, writes the correct entry to the Combat Archives, and triggers the appropriate victory or defeat modal. Because this happens via push on both sides at the same time, both modals appear within milliseconds of each other — which is the defining real-time moment of the entire game.
 
-The third is the global activity feed. Every significant battle event is broadcast through the Reactivity layer and reflected in the live ticker at the bottom of the landing page and in the Hall of Legends, giving the whole game a sense of a living, active world.
+The third is the global activity feed and online presence system. Every significant battle event is broadcast through the Reactivity layer and reflected in the live ticker at the bottom of the landing page. In the Siege Chamber, the system listens to all activity events globally and stamps each player's last seen timestamp in real time to show who is currently active.
 
 The **REACTIVITY LIVE** badge visible on every page of the app is not decorative — it is a live indicator that the WebSocket connection to Somnia is active and listening. When both players have that badge lit up and a raid fires, you can watch both screens react to the same on-chain event at the same moment. That is the Somnia Reactivity SDK doing exactly what it was built to do.
 
@@ -53,6 +53,8 @@ The **REACTIVITY LIVE** badge visible on every page of the app is not decorative
 **Resource Economy** — Resources accumulate passively over time based on building levels. The ResourceVault contract tracks every player's Credits, Biomass, Minera, and Vanguard on-chain. Winning a raid transfers 15% of the loser's resources to the winner. A successful intercept costs the attacker a 5% penalty.
 
 **Hall of Legends** — A live leaderboard showing the top commanders ranked by victories and loot earned. Players can raid anyone on the leaderboard directly with one click — even offline players, making top-ranked positions genuinely dangerous to hold.
+
+**Live Online Presence** — The Siege Chamber shows which commanders are active right now. Any player who collected, built, attacked, or registered in the last 5 minutes appears with a teal Live indicator. Powered entirely by the Reactivity SDK — no polling.
 
 **Combat Archives** — A full battle history for every player, enriched with on-chain transaction hashes. Every entry links directly to the Somnia explorer so results are independently verifiable. Export your entire battle history as a document.
 
