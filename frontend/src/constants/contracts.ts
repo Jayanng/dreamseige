@@ -33,7 +33,7 @@ export const somniaTestnet = defineChain({
 // ── Contract Addresses (fill after deploy) ────────────────────────────────────
 export const CONTRACT_ADDRESSES = {
   BASE_CONTRACT: '0xDaf4406Ce895f4261FFaF4e665b9F49b71050A66',
-  RESOURCE_VAULT: '0xa737c12dc5291cd67715e1cb5e0b04cfeb70ab3d',
+  RESOURCE_VAULT: '0x15c18a11ca29e56a068fb21f4662129dbdbe20ba',
   PVP_ARENA: '0xd8665b7f204b073843334d9747317829e5a83945' as `0x${string}`,
   LEADERBOARD_CONTRACT: '0x95396246b715Ff6a7Db39040E9be43Bdb5701b0b',
   EMPIRE_REGISTRY: '0x1d617cC33411562c0c25Ce35A1B6F08E92d74916',
@@ -361,13 +361,21 @@ export const EMPIRE_REGISTRY_ABI = [
     inputs: [{ name: "name", type: "string" }], outputs: [{ type: "bool" }]
   },
 
-  // Events
   {
     name: "EmpireRegistered", type: "event",
     inputs: [
       { name: "player", type: "address", indexed: true },
       { name: "name", type: "string" },
       { name: "badge", type: "string" },
+      { name: "timestamp", type: "uint40" },
+    ]
+  },
+  {
+    name: "EmpireRenamed", type: "event",
+    inputs: [
+      { name: "player", type: "address", indexed: true },
+      { name: "oldName", type: "string" },
+      { name: "newName", type: "string" },
       { name: "timestamp", type: "uint40" },
     ]
   },

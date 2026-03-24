@@ -5,7 +5,7 @@
 
 import { useEffect, useRef, useCallback } from "react";
 import { encodeEventTopics, decodeEventLog } from "viem";
-import { CONTRACT_ADDRESSES, BASE_CONTRACT_ABI, PVP_ARENA_ABI, LEADERBOARD_CONTRACT_ABI, RESOURCE_VAULT_ABI } from "../constants/contracts";
+import { CONTRACT_ADDRESSES, BASE_CONTRACT_ABI, PVP_ARENA_ABI, LEADERBOARD_CONTRACT_ABI, RESOURCE_VAULT_ABI, EMPIRE_REGISTRY_ABI } from "../constants/contracts";
 import { reactivityClient, publicClient } from "../lib/somniaClients";
 
 // ── Main Hook ─────────────────────────────────────────────────────────────────
@@ -674,17 +674,94 @@ export function useReactivity() {
       }
     }, (u) => { unsubs.push(u); unsubsRef.current.push(u); });
 
-    // 3. BattleResolved (PvPArena) - winner and loser are active
+    // 3. RaidIntercepted (PvPArena) - counts as activity for defender (and attacker)
     safeSubscribe({
       ethCalls: [],
       eventContractSources: [CONTRACT_ADDRESSES.PVP_ARENA],
-      topicOverrides: encodeEventTopics({ abi: PVP_ARENA_ABI, eventName: "BattleResolved" }),
+      topicOverrides: encodeEventTopics({ abi: PVP_ARENA_ABI, eventName: "RaidIntercepted" }),
       onData: (data: any) => {
         try {
           const log = decodeEventLog({ abi: PVP_ARENA_ABI, data: data.result.data, topics: data.result.topics });
           const args = log.args as any;
-          callback(args.winner);
-          callback(args.loser);
+          callback(args.defender);
+          callback(args.attacker);
+        } catch (e) {}
+      }
+    }, (u) => { unsubs.push(u); unsubsRef.current.push(u); });
+
+    // 4. Empire Identity Actions (EmpireRegistry)
+    safeSubscribe({
+      ethCalls: [],
+      eventContractSources: [CONTRACT_ADDRESSES.EMPIRE_REGISTRY],
+      topicOverrides: encodeEventTopics({ abi: EMPIRE_REGISTRY_ABI, eventName: "EmpireRegistered" }),
+      onData: (data: any) => {
+        try {
+          const log = decodeEventLog({ abi: EMPIRE_REGISTRY_ABI, data: data.result.data, topics: data.result.topics, eventName: "EmpireRegistered" });
+          callback((log.args as any).player);
+        } catch (e) {}
+      }
+    }, (u) => { unsubs.push(u); unsubsRef.current.push(u); });
+
+    safeSubscribe({
+      ethCalls: [],
+      eventContractSources: [CONTRACT_ADDRESSES.EMPIRE_REGISTRY],
+      topicOverrides: encodeEventTopics({ abi: EMPIRE_REGISTRY_ABI, eventName: "EmpireRenamed" }),
+      onData: (data: any) => {
+        try {
+          const log = decodeEventLog({ abi: EMPIRE_REGISTRY_ABI, data: data.result.data, topics: data.result.topics, eventName: "EmpireRenamed" });
+          callback((log.args as any).player);
+        } catch (e) {}
+      }
+    }, (u) => { unsubs.push(u); unsubsRef.current.push(u); });
+
+    // 5. Base Initialization (BaseContract)
+    safeSubscribe({
+      ethCalls: [],
+      eventContractSources: [CONTRACT_ADDRESSES.BASE_CONTRACT],
+      topicOverrides: encodeEventTopics({ abi: BASE_CONTRACT_ABI, eventName: "BaseInitialized" }),
+      onData: (data: any) => {
+        try {
+          const log = decodeEventLog({ abi: BASE_CONTRACT_ABI, data: data.result.data, topics: data.result.topics });
+          callback((log.args as any).owner);
+        } catch (e) {}
+      }
+    }, (u) => { unsubs.push(u); unsubsRef.current.push(u); });
+
+    // 6. ResourceUpdated (ResourceVault) — fires when player collects resources
+    safeSubscribe({
+      ethCalls: [],
+      eventContractSources: [CONTRACT_ADDRESSES.RESOURCE_VAULT],
+      topicOverrides: encodeEventTopics({ abi: RESOURCE_VAULT_ABI, eventName: "ResourceUpdated" }),
+      onData: (data: any) => {
+        try {
+          const log = decodeEventLog({ abi: RESOURCE_VAULT_ABI, data: data.result.data, topics: data.result.topics });
+          callback((log.args as any).player);
+        } catch (e) {}
+      }
+    }, (u) => { unsubs.push(u); unsubsRef.current.push(u); });
+
+    // 7. UpgradeStarted (BaseContract)
+    safeSubscribe({
+      ethCalls: [],
+      eventContractSources: [CONTRACT_ADDRESSES.BASE_CONTRACT],
+      topicOverrides: encodeEventTopics({ abi: BASE_CONTRACT_ABI, eventName: "UpgradeStarted" }),
+      onData: (data: any) => {
+        try {
+          const log = decodeEventLog({ abi: BASE_CONTRACT_ABI, data: data.result.data, topics: data.result.topics });
+          callback((log.args as any).owner ?? (log.args as any).player ?? (log.args as any).baseOwner);
+        } catch (e) {}
+      }
+    }, (u) => { unsubs.push(u); unsubsRef.current.push(u); });
+
+    // 8. BuildingPlaced (BaseContract)
+    safeSubscribe({
+      ethCalls: [],
+      eventContractSources: [CONTRACT_ADDRESSES.BASE_CONTRACT],
+      topicOverrides: encodeEventTopics({ abi: BASE_CONTRACT_ABI, eventName: "BuildingPlaced" }),
+      onData: (data: any) => {
+        try {
+          const log = decodeEventLog({ abi: BASE_CONTRACT_ABI, data: data.result.data, topics: data.result.topics });
+          callback((log.args as any).owner ?? (log.args as any).player ?? (log.args as any).baseOwner);
         } catch (e) {}
       }
     }, (u) => { unsubs.push(u); unsubsRef.current.push(u); });

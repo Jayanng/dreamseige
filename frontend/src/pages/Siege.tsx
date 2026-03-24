@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CONTRACT_ADDRESSES, PVP_ARENA_ABI, LEADERBOARD_CONTRACT_ABI, BASE_CONTRACT_ABI, RESOURCE_VAULT_ABI } from '../constants/contracts';
+import { CONTRACT_ADDRESSES, PVP_ARENA_ABI, LEADERBOARD_CONTRACT_ABI, BASE_CONTRACT_ABI, RESOURCE_VAULT_ABI, EMPIRE_REGISTRY_ABI } from '../constants/contracts';
 import { useReactivity } from '../hooks/useReactivity';
 import { toHex, encodeEventTopics, decodeEventLog } from 'viem';
 import { publicClient } from '../lib/somniaClients';
-import { Shield, ShieldAlert, Trophy, Skull, Crosshair, Target, Activity, RefreshCw } from 'lucide-react';
+import { Shield, ShieldAlert, Trophy, Skull, Crosshair, Target, Activity, RefreshCw, Loader2 } from 'lucide-react';
 import { useAccount, useReadContract, useReadContracts, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 
 
@@ -16,6 +16,7 @@ export default function Siege() {
   const [selectedTargetData, setSelectedTargetData] = useState<any>(null);
   const [troopDeployment, setTroopDeployment] = useState(75);
   const [battleResult, setBattleResult] = useState<any>(null);
+  const [battleResultLoading, setBattleResultLoading] = useState(false);
   const [activeBattleId, setActiveBattleId] = useState<bigint | null>(null);
   const [incomingAttacker, setIncomingAttacker] = useState<string | null>(null);
   const [etaSeconds, setEtaSeconds] = useState(0);
@@ -84,6 +85,9 @@ export default function Siege() {
 
   // Presence State: { address -> lastActivityTimestamp }
   const [onlineStatus, setOnlineStatus] = useState<Record<string, number>>({});
+  const [tick, setTick] = useState(0);
+  const [allRegisteredPlayers, setAllRegisteredPlayers] = useState<Array<{ address: string; name: string }>>([]);
+  const [registryLoading, setRegistryLoading] = useState(false);
 
   // Reactivity Subscriptions
   useEffect(() => {
@@ -95,10 +99,36 @@ export default function Siege() {
     const unsubActivity = subscribeToAllActivity((actor) => {
       if (!actor) return;
 
+      // Stamp online
       setOnlineStatus(prev => ({
         ...prev,
         [actor.toLowerCase()]: Math.floor(Date.now() / 1000)
       }));
+
+      // If this actor is not yet in the target list, fetch their empire and append them
+      setAllRegisteredPlayers(prev => {
+        const already = prev.some(p => p.address.toLowerCase() === actor.toLowerCase());
+        if (already) return prev;
+
+        // Fetch their empire name asynchronously and update state once resolved
+        publicClient.readContract({
+          address: CONTRACT_ADDRESSES.EMPIRE_REGISTRY,
+          abi: EMPIRE_REGISTRY_ABI,
+          functionName: 'getEmpire',
+          args: [actor as `0x${string}`],
+        }).then((empire: any) => {
+          if (empire && empire.exists) {
+            setAllRegisteredPlayers(latest => {
+              const stillAbsent = !latest.some(p => p.address.toLowerCase() === actor.toLowerCase());
+              if (!stillAbsent) return latest;
+              return [...latest, { address: actor, name: empire.name }];
+            });
+          }
+        }).catch(() => {});
+
+        // Return prev unchanged — the async update above will add them once resolved
+        return prev;
+      });
     });
 
     // 2. Listen for challenges issued to ME
@@ -284,6 +314,7 @@ export default function Siege() {
     if (!resolveHash) return;
     const processResolveReceipt = async () => {
       try {
+        setBattleResultLoading(true);
         const receipt = await publicClient.waitForTransactionReceipt({
           hash: resolveHash
         });
@@ -305,6 +336,7 @@ export default function Siege() {
           const args = decoded.args as any;
           console.log("[Phase 7] Battle resolved! winner:", winner);
           const isWinner = winner.toLowerCase() === address?.toLowerCase();
+          setBattleResultLoading(false);
           setBattleResult({
             won: isWinner,
             loot: Number(creditsLooted),
@@ -340,7 +372,7 @@ export default function Siege() {
     if (!interceptHash) return;
     const processInterceptReceipt = async () => {
       try {
-
+        setBattleResultLoading(true);
         const receipt = await publicClient.waitForTransactionReceipt({
           hash: interceptHash
         });
@@ -364,6 +396,7 @@ export default function Siege() {
           console.log("[Phase 7] Intercept resolved! winner:", winner);
 
           const isWinner = winner.toLowerCase() === address?.toLowerCase();
+          setBattleResultLoading(false);
           setBattleResult({
             won: isWinner,
             loot: Number(creditsLooted),
@@ -396,6 +429,7 @@ export default function Siege() {
           console.warn("[Phase 7] No BattleResolved log in intercept receipt. Checking battle state...");
           if (activeBattleId) {
             try {
+              await new Promise(resolve => setTimeout(resolve, 2000));
               const battle = await publicClient.readContract({
                 address: CONTRACT_ADDRESSES.PVP_ARENA,
                 abi: PVP_ARENA_ABI,
@@ -405,11 +439,28 @@ export default function Siege() {
               if (battle && (battle.status === 2 || battle.status === 3)) {
                 const winner = battle.attackerWon ? battle.attacker : battle.defender;
                 const isWinner = winner?.toLowerCase() === address?.toLowerCase();
+                setBattleResultLoading(false);
                 setBattleResult({
                   won: isWinner,
                   loot: Number(battle.lootCredits || 0),
-                  target: incomingAttacker || selectedTarget || "Opponent"
+                  target: isWinner
+                    ? (incomingAttacker || "Attacker")
+                    : (selectedTarget || "Opponent")
                 });
+
+                // Enrich existing log entry with real txHash (mirrors happy path)
+                try {
+                  const key = `battleLogs_${address?.toLowerCase()}`;
+                  const existing = JSON.parse(localStorage.getItem(key) || '[]');
+                  const enriched = existing.map((l: any) =>
+                    l.id === activeBattleId?.toString()
+                      ? { ...l, txHash: receipt.transactionHash, txLink: `https://shannon-explorer.somnia.network/tx/${receipt.transactionHash}` }
+                      : l
+                  );
+                  localStorage.setItem(key, JSON.stringify(enriched));
+                  window.dispatchEvent(new StorageEvent('storage', { key }));
+                } catch (e) {}
+
                 setActiveBattleId(null);
                 setIncomingAttacker(null);
                 setEtaSeconds(0);
@@ -678,6 +729,51 @@ export default function Siege() {
 
   const isAttacking = siegePending || siegeConfirming;
 
+  const fetchRegisteredEmpires = useCallback(async () => {
+    setRegistryLoading(true);
+    try {
+      const logs = await publicClient.getLogs({
+        address: CONTRACT_ADDRESSES.EMPIRE_REGISTRY,
+        event: {
+          type: 'event',
+          name: 'EmpireRegistered',
+          inputs: [
+            { name: 'player', type: 'address', indexed: true },
+            { name: 'name', type: 'string', indexed: false },
+            { name: 'badge', type: 'string', indexed: false },
+            { name: 'timestamp', type: 'uint40', indexed: false },
+          ],
+        },
+        fromBlock: 0n,
+        toBlock: 'latest',
+      });
+
+      const players = logs.map(log => ({
+        address: (log.args as any).player as string,
+        name: (log.args as any).name as string,
+      }));
+
+      // Deduplicate by address (in case of any duplicate events)
+      const seen = new Set<string>();
+      const unique = players.filter(p => {
+        const key = p.address.toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+
+      setAllRegisteredPlayers(unique);
+    } catch (e) {
+      console.error('[EmpireRegistry] Failed to fetch registered empires:', e);
+    } finally {
+      setRegistryLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchRegisteredEmpires();
+  }, [fetchRegisteredEmpires]);
+
   const { data: topPlayersData, isLoading: topPlayersLoading, refetch: refetchTopPlayers } = useReadContract({
     address: CONTRACT_ADDRESSES.LEADERBOARD_CONTRACT,
     abi: LEADERBOARD_CONTRACT_ABI,
@@ -693,6 +789,27 @@ export default function Siege() {
       functionName: 'getPlayerStats',
       args: [addr],
     })),
+  });
+
+  // MULTICALL: Fetch lastTickAt for all players via getBase
+  const { data: baseData } = useReadContracts({
+    contracts: (topPlayersData ? (topPlayersData as any)[0] : []).map((addr: string) => ({
+      address: CONTRACT_ADDRESSES.BASE_CONTRACT,
+      abi: BASE_CONTRACT_ABI,
+      functionName: 'getBase',
+      args: [addr],
+    })),
+  });
+
+  // MULTICALL: Fetch getBase for all registered empire players (full registry)
+  const { data: registryBaseData } = useReadContracts({
+    contracts: allRegisteredPlayers.map(p => ({
+      address: CONTRACT_ADDRESSES.BASE_CONTRACT,
+      abi: BASE_CONTRACT_ABI,
+      functionName: 'getBase',
+      args: [p.address as `0x${string}`],
+    })),
+    query: { enabled: allRegisteredPlayers.length > 0 },
   });
 
   // Sync Multicall data to local onlineStatus state
@@ -715,22 +832,80 @@ export default function Siege() {
     setOnlineStatus(newStatus);
   }, [statsData, topPlayersData]);
 
+  // Seed onlineStatus from getBase.lastTickAt (resource collection timestamp)
+  useEffect(() => {
+    if (!baseData || !topPlayersData) return;
+    const addresses = (topPlayersData as any)[0] as string[];
+
+    setOnlineStatus(prev => {
+      const updated = { ...prev };
+      baseData.forEach((result: any, i: number) => {
+        if (result.status === 'success' && result.result) {
+          const lastTick = Number(result.result.lastTickAt);
+          const addr = addresses[i].toLowerCase();
+          // Only update if this is fresher than what we already have
+          if (lastTick > 0 && (!updated[addr] || lastTick > updated[addr])) {
+            updated[addr] = lastTick;
+          }
+        }
+      });
+      return updated;
+    });
+  }, [baseData, topPlayersData]);
+
+  // Seed onlineStatus from registryBaseData (covers all registered empires)
+  useEffect(() => {
+    if (!registryBaseData || allRegisteredPlayers.length === 0) return;
+
+    setOnlineStatus(prev => {
+      const updated = { ...prev };
+      registryBaseData.forEach((result: any, i: number) => {
+        if (result.status === 'success' && result.result) {
+          const lastTick = Number(result.result.lastTickAt);
+          const addr = allRegisteredPlayers[i].address.toLowerCase();
+          if (lastTick > 0 && (!updated[addr] || lastTick > updated[addr])) {
+            updated[addr] = lastTick;
+          }
+        }
+      });
+      return updated;
+    });
+  }, [registryBaseData, allRegisteredPlayers]);
+
+  // Tick every 30s to force online/idle re-evaluation as players go quiet
+  useEffect(() => {
+    const interval = setInterval(() => setTick(t => t + 1), 30_000);
+    return () => clearInterval(interval);
+  }, []);
+
   const { onlineTargets, idleTargets } = useMemo(() => {
-    const fetchedPlayers = topPlayersData ? (topPlayersData as [string[], number[], string[]])[0].map((addr, i) => {
-      const lastActivity = onlineStatus[addr.toLowerCase()] || 0;
-      // Increased window to 10 minutes (600s)
-      const isOnline = (Math.floor(Date.now() / 1000) - lastActivity) < 600;
+    // Build from full registry — all registered empires regardless of leaderboard rank
+    const registryPlayers = allRegisteredPlayers.map((p, i) => {
+      const lastActivity = onlineStatus[p.address.toLowerCase()] || 0;
+      const isOnline = lastActivity > 0 && (Math.floor(Date.now() / 1000) - lastActivity) < 300;
+
+      // Supplement with leaderboard data if available
+      const leaderboardIndex = topPlayersData
+        ? (topPlayersData as [string[], number[], string[]])[0]
+            .findIndex(a => a.toLowerCase() === p.address.toLowerCase())
+        : -1;
+
+      const wins = leaderboardIndex >= 0
+        ? (topPlayersData as [string[], number[], string[]])[1][leaderboardIndex]
+        : 0;
 
       return {
-        address: addr,
-        name: (topPlayersData as [string[], number[], string[]])[2][i] || 'Unknown Empire',
-        wins: (topPlayersData as [string[], number[], string[]])[1][i],
+        address: p.address,
+        name: p.name || 'Unknown Empire',
+        wins,
         loot: (10 + (i * 2)).toString(),
         def: 50 + (i * 10),
         winChance: 70 - (i * 5),
         isOnline
       };
-    }) : [];
+    });
+
+    const fetchedPlayers = registryPlayers;
 
     const allTargets = [...fetchedPlayers, ...manualTargets];
 
@@ -744,7 +919,7 @@ export default function Siege() {
       onlineTargets: uniqueTargets.filter(t => t.isOnline),
       idleTargets: uniqueTargets.filter(t => !t.isOnline)
     };
-  }, [topPlayersData, address, onlineStatus, manualTargets]);
+  }, [topPlayersData, address, onlineStatus, manualTargets, tick, allRegisteredPlayers]);
 
   const selectTarget = (target: any) => {
     setSelectedTarget(target.address);
@@ -870,11 +1045,11 @@ export default function Siege() {
                 Online Targets
               </h3>
               <button
-                onClick={() => refetchTopPlayers()}
+                onClick={() => { refetchTopPlayers(); fetchRegisteredEmpires(); }}
                 className="p-1 hover:bg-[#2A2A45] rounded-md transition-colors"
                 title="Refresh targets"
               >
-                <RefreshCw className={`w-3 h-3 text-[#5A5880] ${topPlayersLoading ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`w-3 h-3 text-[#5A5880] ${(topPlayersLoading || registryLoading) ? 'animate-spin' : ''}`} />
               </button>
             </div>
             <div className="space-y-4 max-h-[400px] overflow-y-auto custom-scrollbar pr-1">
@@ -1262,7 +1437,7 @@ export default function Siege() {
 
       {/* Battle Result Modal */}
       <AnimatePresence>
-        {battleResult && (
+        {(battleResult || battleResultLoading) && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -1275,50 +1450,73 @@ export default function Siege() {
               exit={{ scale: 0.9, opacity: 0 }}
               className="bg-[#0F0F1E] border border-[#2A2A45] rounded-2xl p-5 sm:p-8 w-full max-w-sm text-center space-y-4 shadow-[0_0_50px_rgba(0,0,0,0.5)]"
             >
-              <div className="flex justify-center">
-                {battleResult.won ? (
-                  <Trophy className="w-16 h-16 text-[#00F5D4] drop-shadow-[0_0_20px_rgba(0,245,212,0.8)]" />
-                ) : (
-                  <Skull className="w-16 h-16 text-[#F72585] drop-shadow-[0_0_20px_rgba(247,37,133,0.8)]" />
-                )}
-              </div>
-              <h2 className={`font-fantasy text-2xl sm:text-3xl tracking-widest uppercase ${battleResult.target === 'expired' ? 'text-gray-400' : battleResult.won ? 'text-[#00F5D4] drop-shadow-[0_0_10px_rgba(0,245,212,0.5)]' : 'text-[#F72585] drop-shadow-[0_0_10px_rgba(247,37,133,0.5)]'}`}>
-                {battleResult.target === 'expired' ? 'EXPIRED' : battleResult.won ? 'VICTORY' : 'DEFEATED'}
-              </h2>
-              <p className="text-[#A09DC0] text-sm font-mono leading-relaxed text-center break-words">
-                {(() => {
-                  const displayTarget = battleResult.target?.startsWith('0x') && battleResult.target.length === 42
-                    ? battleResult.target.slice(0, 6) + '...' + battleResult.target.slice(-4)
-                    : battleResult.target;
-                  return battleResult.target === 'expired'
-                    ? 'The battle window expired. No resources were transferred.'
-                    : battleResult.won
-                      ? battleResult.loot > 0
-                        ? `Raid successful. Looted ${battleResult.loot.toLocaleString()} Credits from ${displayTarget}`
-                        : battleResult.target === (incomingAttacker || '')
-                          ? `Your defense held! The raid from ${displayTarget} was repelled!`
-                          : `Victory! Your forces overwhelmed ${displayTarget}.`
-                      : 'Your forces were repelled. Regroup and try again.';
-                })()}
-              </p>
-              <div className="flex items-center justify-center gap-1.5 py-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#FFD60A] animate-pulse"></span>
-                <span className="text-[9px] font-mono text-[#6B68A0] uppercase tracking-widest">
-                  Result verified by Pyth Entropy
-                </span>
-              </div>
-              <button
-                onClick={() => {
-                  setBattleResult(null);
-                  setActiveBattleId(null);
-                  setIncomingAttacker(null);
-                  setEtaSeconds(0);
-                  autoResolveTriggered.current = false;
-                }}
-                className="w-full py-3 rounded-lg bg-[#9B5DE5]/20 border border-[#9B5DE5]/40 text-[#D4D0F0] font-bold text-sm uppercase tracking-widest hover:bg-[#9B5DE5]/30 transition-all active:scale-[0.98]"
-              >
-                Continue
-              </button>
+              {battleResultLoading ? (
+                <>
+                  <div className="flex justify-center">
+                    <Loader2 className="w-16 h-16 text-[#00F5D4] animate-spin drop-shadow-[0_0_20px_rgba(0,245,212,0.8)]" />
+                  </div>
+                  <h2 className="font-fantasy text-2xl sm:text-3xl tracking-widest uppercase text-[#00F5D4] drop-shadow-[0_0_10px_rgba(0,245,212,0.5)]">
+                    CONFIRMING ON-CHAIN...
+                  </h2>
+                  <p className="text-[#A09DC0] text-sm font-mono leading-relaxed text-center">
+                    Your battle result is being verified
+                  </p>
+                </>
+              ) : battleResult ? (
+                <>
+                  <div className="flex justify-center">
+                    {battleResult.won ? (
+                      <Trophy className="w-16 h-16 text-[#00F5D4] drop-shadow-[0_0_20px_rgba(0,245,212,0.8)]" />
+                    ) : (
+                      <Skull className="w-16 h-16 text-[#F72585] drop-shadow-[0_0_20px_rgba(247,37,133,0.8)]" />
+                    )}
+                  </div>
+                  <h2 className={`font-fantasy text-2xl sm:text-3xl tracking-widest uppercase ${battleResult.target === 'expired' ? 'text-gray-400' : battleResult.won ? 'text-[#00F5D4] drop-shadow-[0_0_10px_rgba(0,245,212,0.5)]' : 'text-[#F72585] drop-shadow-[0_0_10px_rgba(247,37,133,0.5)]'}`}>
+                    {battleResult.target === 'expired' ? 'EXPIRED' : battleResult.won ? 'VICTORY' : 'DEFEATED'}
+                  </h2>
+                  <p className="text-[#A09DC0] text-sm font-mono leading-relaxed text-center break-words">
+                    {(() => {
+                      const displayTarget = battleResult.target?.startsWith('0x') && battleResult.target.length === 42
+                        ? battleResult.target.slice(0, 6) + '...' + battleResult.target.slice(-4)
+                        : battleResult.target;
+
+                      return battleResult.target === 'expired'
+                        ? 'The battle window expired. No resources were transferred.'
+                        : battleResult.won
+                          ? battleResult.loot > 0
+                            ? <span>Looted {battleResult.loot.toLocaleString()} Credits from {displayTarget}</span>
+                            : battleResult.target === (incomingAttacker || '')
+                              ? `Your defense held! The raid from ${displayTarget} was repelled!`
+                              : `Victory! Your forces overwhelmed ${displayTarget}.`
+                          : <span>
+                              {battleResult.loot > 0
+                                ? `Your base was raided. -${battleResult.loot.toLocaleString()} Credits lost to attacker.`
+                                : 'Your forces were repelled.'
+                              }
+                            </span>;
+                    })()}
+                  </p>
+                  <div className="flex items-center justify-center gap-1.5 py-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#FFD60A] animate-pulse"></span>
+                    <span className="text-[9px] font-mono text-[#6B68A0] uppercase tracking-widest">
+                      Result verified by Pyth Entropy
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setBattleResult(null);
+                      setBattleResultLoading(false);
+                      setActiveBattleId(null);
+                      setIncomingAttacker(null);
+                      setEtaSeconds(0);
+                      autoResolveTriggered.current = false;
+                    }}
+                    className="w-full py-3 rounded-lg bg-[#9B5DE5]/20 border border-[#9B5DE5]/40 text-[#D4D0F0] font-bold text-sm uppercase tracking-widest hover:bg-[#9B5DE5]/30 transition-all active:scale-[0.98]"
+                  >
+                    Continue
+                  </button>
+                </>
+              ) : null}
             </motion.div>
           </motion.div>
         )}

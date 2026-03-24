@@ -279,6 +279,15 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           newValue: JSON.stringify(updated)
         }));
 
+        // Dispatch custom event for Siege.tsx to enrich the modal
+        window.dispatchEvent(new CustomEvent('battleLootData', {
+          detail: {
+            battleId: battleId.toString(),
+            creditsLooted: Number(credits),
+            isWinner
+          }
+        }));
+
         // Enrich with real txHash by fetching from chain (works for both players, retries at 7s)
         (async () => {
           try {

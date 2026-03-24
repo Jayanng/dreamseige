@@ -31,9 +31,9 @@ forge script script/FundHandlers.s.sol:FundHandlers --rpc-url somnia_testnet --b
 
 | Contract | Address |
 | :--- | :--- |
-| **BaseContract** | `0xb8C43C55587d4460f1Bd959074E5A1f0A3d4F735` |
-| **ResourceVault** | `0x721978cbB41De6E7E4892638624b1E7152156F19` |
-| **PvPArena** | `0xd6602F02E0B0DA759B84F85F815aF611820B0a22` |
+| **BaseContract** | `0xDaf4406Ce895f4261FFaF4e665b9F49b71050A66` |
+| **ResourceVault** | `0x15c18a11ca29e56a068fb21f4662129dbdbe20ba` |
+| **PvPArena** | `0xd8665b7f204b073843334d9747317829e5a83945` |
 | **LeaderboardContract** | `0x95396246b715Ff6a7Db39040E9be43Bdb5701b0b` |
 | **EmpireRegistry** | `0x1d617cC33411562c0c25Ce35A1B6F08E92d74916` |
 | **RewardsDistributor** | `0x9e05bB09A8ffE776585E61d5378cCd89DdA239d5` |

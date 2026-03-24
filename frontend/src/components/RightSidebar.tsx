@@ -22,6 +22,7 @@ export default function RightSidebar() {
   const { startUpgrade, isPending: upgradePending, isSuccess: upgradeConfirmed } = useStartUpgrade();
   const { address } = useAccount();
   const publicClient = usePublicClient();
+  const [showUpgradeWarning, setShowUpgradeWarning] = React.useState(false);
 
   const { data: playerStats } = useReadContract({
     address: CONTRACT_ADDRESSES.LEADERBOARD_CONTRACT as `0x${string}`,
@@ -50,6 +51,19 @@ export default function RightSidebar() {
   const maxPower = Math.max(defensePower + attackPower, 1);
   const baseDefense = Math.min(Math.round((defensePower / maxPower) * 100), 99);
 
+  // Get current level from global buildings state for accuracy
+  const currentBuilding = selectedBuilding ? buildings[selectedBuilding.slot] : null;
+  const currentLevel = currentBuilding?.level || selectedBuilding?.level || 1;
+
+  const getUpgradeCosts = (level: number) => {
+    const next = level + 1;
+    return {
+      credits: 100 * next,
+      biomass: 50 * next,
+      minera: 50 * next
+    };
+  };
+
   // Watch for upgrade confirmation to refresh state
   React.useEffect(() => {
     if (upgradeConfirmed) {
@@ -57,26 +71,43 @@ export default function RightSidebar() {
     }
   }, [upgradeConfirmed, refreshEmpireState]);
 
+  // Clear warning when selected building changes
+  React.useEffect(() => {
+    setShowUpgradeWarning(false);
+  }, [selectedBuilding]);
+
+  // Clear warning when stored balance becomes sufficient
+  React.useEffect(() => {
+    if (!showUpgradeWarning || !resources || !selectedBuilding) return;
+    const costs = getUpgradeCosts(currentLevel);
+    const nowCovers =
+      BigInt(resources.gold)  >= BigInt(costs.credits) &&
+      BigInt(resources.wood)  >= BigInt(costs.biomass) &&
+      BigInt(resources.stone) >= BigInt(costs.minera);
+    if (nowCovers) setShowUpgradeWarning(false);
+  }, [resources, showUpgradeWarning, currentLevel, selectedBuilding]);
+
   const handleUpgrade = async () => {
     if (!selectedBuilding || !address || !base || !resources) return;
-    
+
     const costs = getUpgradeCosts(currentLevel);
-    
+
     // Check requirements against Vault resources (Primary Economy)
-    const hasEnough = 
+    const hasEnough =
       BigInt(resources.gold) >= BigInt(costs.credits) &&
       BigInt(resources.wood) >= BigInt(costs.biomass) &&
       BigInt(resources.stone) >= BigInt(costs.minera);
 
     if (!hasEnough) {
-      addEvent('system', `❌ <span class="text-accent-pink">Insufficient resources</span> for upgrade.`, 'high');
+      setShowUpgradeWarning(true);
       return;
     }
+    setShowUpgradeWarning(false);
 
     try {
       await startUpgrade(selectedBuilding.slot);
       const name = BUILDING_NAMES[selectedBuilding.buildingType as keyof typeof BUILDING_NAMES];
-      
+
       addEvent('upgrade', `Instant upgrade initiated for <span class="text-accent-teal">${name}</span> on slot ${selectedBuilding.slot}...`, 'medium');
 
       // OPTIMISTIC UI: Deduct resources locally immediately
@@ -94,19 +125,6 @@ export default function RightSidebar() {
       console.error('Upgrade failed:', error);
       addEvent('system', `❌ Upgrade failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'high');
     }
-  };
-
-  // Get current level from global buildings state for accuracy
-  const currentBuilding = selectedBuilding ? buildings[selectedBuilding.slot] : null;
-  const currentLevel = currentBuilding?.level || selectedBuilding?.level || 1;
-
-  const getUpgradeCosts = (level: number) => {
-    const next = level + 1;
-    return {
-      credits: 100 * next,
-      biomass: 50 * next,
-      minera: 50 * next
-    };
   };
 
   return (
@@ -151,6 +169,12 @@ export default function RightSidebar() {
                   </span>
                 </div>
               </div>
+
+              {showUpgradeWarning && (
+                <p className="text-[10px] font-mono text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/30 rounded-lg px-3 py-2">
+                  ⚠️ Insufficient balance. Collect your pending resources first.
+                </p>
+              )}
 
               <button
                 disabled={upgradePending}

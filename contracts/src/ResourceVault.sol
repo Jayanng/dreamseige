@@ -275,9 +275,6 @@ contract ResourceVault {
     ) external {
         if (msg.sender != baseContract) revert OnlyBaseContract();
 
-        // Settle resources first
-        _collectResourcesFor(player);
-
         Resources storage res = vaults[player];
         if (res.credits < creditsCost ||
             res.biomass < biomassCost ||
@@ -313,10 +310,6 @@ contract ResourceVault {
         uint64 mineraLooted
     ) {
         if (msg.sender != pvpArena) revert OnlyArena();
-
-        // Settle resources for both parties before processing loot
-        _collectResourcesFor(attacker);
-        _collectResourcesFor(defender);
 
         Resources storage defRes = vaults[defender];
         Resources storage atkRes = vaults[attacker];
