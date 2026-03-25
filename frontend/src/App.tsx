@@ -17,6 +17,7 @@ import Header from './components/Header';
 import RightSidebar from './components/RightSidebar';
 import MobileNav from './components/MobileNav';
 import { useGame } from './context/GameContext';
+import { useReactivity } from './hooks/useReactivity';
 
 const PageWrapper = ({ children }: { children: React.ReactNode }) => (
   <motion.div
@@ -62,9 +63,29 @@ const IncomingRaidOverlay = () => {
   const { incomingRaid, setIncomingRaid } = useGame();
   const location = useLocation();
   const navigate = useNavigate();
+  const { subscribeToAttackResolved } = useReactivity();
   console.log('[IncomingRaidOverlay] Rendering, incomingRaid:', incomingRaid?.battleId?.toString());
 
-  // Poll battle status — when resolved, clear overlay and navigate to /siege for the modal
+  // Reactivity: fire instantly when battle resolves on-chain
+  useEffect(() => {
+    if (!incomingRaid || location.pathname === '/siege') return;
+    const unsubResolved = subscribeToAttackResolved(incomingRaid.battleId, (winner, attackerWon) => {
+      setIncomingRaid(null);
+      const isWinner = !attackerWon; // defender wins if attacker lost
+      navigate('/siege', {
+        state: {
+          immediateResult: {
+            won: isWinner,
+            loot: 0,
+            target: incomingRaid.attacker
+          }
+        }
+      });
+    });
+    return () => unsubResolved();
+  }, [incomingRaid?.battleId, location.pathname, subscribeToAttackResolved]);
+
+  // Poll battle status as fallback — when resolved, clear overlay and navigate to /siege for the modal
   useEffect(() => {
     if (!incomingRaid || location.pathname === '/siege') return;
     const checkBattle = async () => {

@@ -160,16 +160,17 @@ export default function Siege() {
   useEffect(() => {
     if (!address || !activeBattleId) return;
 
-    const unsubResolved = subscribeToAttackResolved(activeBattleId, (winner, attackerWon, lootCredits) => {
+    const unsubResolved = subscribeToAttackResolved(activeBattleId, (winner, attackerWon, lootCredits, lootBiomass, lootMinera) => {
       const isWinner = winner.toLowerCase() === address.toLowerCase();
       // Resolve opponent name: if we are the defender, opponent is incomingAttacker; otherwise use selectedTarget
       const opponentName = incomingAttacker || selectedTarget || "Opponent";
 
       // Only set if no other path has already set the result (functional update guards against stale closure)
       // Log writing is handled by GameContext's subscribeToAllResolutions which has the real txHash.
+      setBattleResultLoading(true);
       setBattleResult((prev: any) => prev !== null ? prev : {
         won: isWinner,
-        loot: Number(lootCredits),
+        loot: Number(lootCredits) + Number(lootBiomass) + Number(lootMinera),
         target: opponentName
       });
       // State cleanup is intentionally left to the Continue button so this subscription
@@ -206,10 +207,23 @@ export default function Siege() {
   useEffect(() => {
     if (etaSeconds <= 0) return;
     const timer = setInterval(() => {
-      setEtaSeconds(prev => prev > 0 ? prev - 1 : 0);
+      setEtaSeconds(prev => {
+        if (prev <= 1) {
+          setBattleResultLoading(true);
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
     return () => clearInterval(timer);
   }, [etaSeconds]);
+
+  // Once a battle result is stored, show spinner briefly then reveal result
+  useEffect(() => {
+    if (!battleResult) return;
+    const timer = setTimeout(() => setBattleResultLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, [battleResult]);
 
   const formatEta = (seconds: number) => {
     if (seconds <= 0) return 'READY';
@@ -332,14 +346,14 @@ export default function Siege() {
             data: log.data,
             topics: log.topics
           });
-          const { winner, attackerWon, creditsLooted } = decoded.args as any;
+          const { winner, attackerWon, creditsLooted, biomassLooted, mineraLooted } = decoded.args as any;
           const args = decoded.args as any;
           console.log("[Phase 7] Battle resolved! winner:", winner);
           const isWinner = winner.toLowerCase() === address?.toLowerCase();
-          setBattleResultLoading(false);
+          setBattleResultLoading(true);
           setBattleResult({
             won: isWinner,
-            loot: Number(creditsLooted),
+            loot: Number(creditsLooted) + Number(biomassLooted) + Number(mineraLooted),
             target: selectedTarget || "Opponent"
           });
 
@@ -392,14 +406,14 @@ export default function Siege() {
             data: log.data,
             topics: log.topics
           });
-          const { winner, attackerWon, creditsLooted } = decoded.args as any;
+          const { winner, attackerWon, creditsLooted, biomassLooted, mineraLooted } = decoded.args as any;
           console.log("[Phase 7] Intercept resolved! winner:", winner);
 
           const isWinner = winner.toLowerCase() === address?.toLowerCase();
-          setBattleResultLoading(false);
+          setBattleResultLoading(true);
           setBattleResult({
             won: isWinner,
-            loot: Number(creditsLooted),
+            loot: Number(creditsLooted) + Number(biomassLooted) + Number(mineraLooted),
             target: isWinner
               ? (incomingAttacker || "Attacker")
               : (selectedTarget || "Opponent")
@@ -439,10 +453,10 @@ export default function Siege() {
               if (battle && (battle.status === 2 || battle.status === 3)) {
                 const winner = battle.attackerWon ? battle.attacker : battle.defender;
                 const isWinner = winner?.toLowerCase() === address?.toLowerCase();
-                setBattleResultLoading(false);
+                setBattleResultLoading(true);
                 setBattleResult({
                   won: isWinner,
-                  loot: Number(battle.lootCredits || 0),
+                  loot: Number(battle.lootCredits || 0) + Number(battle.lootBiomass || 0) + Number(battle.lootMinera || 0),
                   target: isWinner
                     ? (incomingAttacker || "Attacker")
                     : (selectedTarget || "Opponent")
@@ -515,9 +529,10 @@ export default function Siege() {
           : (battle.defenderEmpire || battle.defender?.slice(0,6) + '...' + battle.defender?.slice(-4));
 
         // Show battle result modal for the defender
+        setBattleResultLoading(true);
         setBattleResult((prev: any) => prev !== null ? prev : {
           won: isWinner,
-          loot: battle.status === 3 ? 0 : (isWinner ? Number(battle.lootCredits || 0) : 0),
+          loot: battle.status === 3 ? 0 : (isWinner ? Number(battle.lootCredits || 0) + Number(battle.lootBiomass || 0) + Number(battle.lootMinera || 0) : 0),
           target: opponent
         });
 
@@ -552,9 +567,10 @@ export default function Siege() {
             (battle.attackerWon && battle.attacker?.toLowerCase() === address?.toLowerCase()) ||
             (!battle.attackerWon && battle.defender?.toLowerCase() === address?.toLowerCase());
           console.log("[Phase 7] Polling: Battle RESOLVED on-chain", { battleId: activeBattleId.toString(), isWinner });
+          setBattleResultLoading(true);
           setBattleResult((prev: any) => prev !== null ? prev : {
             won: isWinner,
-            loot: Number(battle.lootCredits),
+            loot: Number(battle.lootCredits || 0) + Number(battle.lootBiomass || 0) + Number(battle.lootMinera || 0),
             target: selectedTarget || "Opponent"
           });
 
@@ -570,6 +586,7 @@ export default function Siege() {
             ? (battle.defenderEmpire || battle.defender?.slice(0,6) + '...' + battle.defender?.slice(-4))
             : (battle.attackerEmpire || battle.attacker?.slice(0,6) + '...' + battle.attacker?.slice(-4));
 
+          setBattleResultLoading(false);
           setBattleResult((prev: any) => prev !== null ? prev : {
             won: isWinner,
             loot: 0,
@@ -1484,13 +1501,13 @@ export default function Siege() {
                         ? 'The battle window expired. No resources were transferred.'
                         : battleResult.won
                           ? battleResult.loot > 0
-                            ? <span>Looted {battleResult.loot.toLocaleString()} Credits from {displayTarget}</span>
+                            ? <span>Total loot: {battleResult.loot.toLocaleString()} resources from {displayTarget}</span>
                             : battleResult.target === (incomingAttacker || '')
                               ? `Your defense held! The raid from ${displayTarget} was repelled!`
                               : `Victory! Your forces overwhelmed ${displayTarget}.`
                           : <span>
                               {battleResult.loot > 0
-                                ? `Your base was raided. -${battleResult.loot.toLocaleString()} Credits lost to attacker.`
+                                ? `Total loot: ${battleResult.loot.toLocaleString()} resources lost to ${displayTarget}`
                                 : 'Your forces were repelled.'
                               }
                             </span>;

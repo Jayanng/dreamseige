@@ -40,6 +40,66 @@ The **REACTIVITY LIVE** badge visible on every page of the app is not decorative
 
 ---
 
+## 🔔 Somnia Reactivity — Full Subscription Map
+
+Every real-time feature in DreamSiege is backed by a specific Somnia Reactivity subscription. Here is the complete map of what is listening and why.
+
+### `GameContext.tsx`
+| Subscription | Purpose |
+| :--- | :--- |
+| `subscribeToResourceTick` | Updates Credits, Biomass, Minera, and Vanguard in real-time as resources accumulate |
+| `subscribeToResourcesCollected` | Triggers empire state refresh the moment a player collects resources on-chain |
+| `subscribeToAllResolutions` | Writes battle results to Combat Archives and triggers victory/defeat modal for the connected player |
+| `subscribeToIncomingAttack` | Fires the full-screen incoming raid overlay the instant an attacker targets you |
+
+### `Siege.tsx`
+| Subscription | Purpose |
+| :--- | :--- |
+| `subscribeToAllActivity` | Tracks live online presence — stamps every player as active when they perform any on-chain action |
+| `subscribeToIncomingAttack` | Sets active battle state for the defender when a siege is launched against them |
+| `subscribeToAllAttacks` | Sets active battle state for the attacker the moment their siege transaction confirms |
+| `subscribeToAttackResolved` | Shows the battle result modal for both attacker and defender simultaneously |
+
+### `Empire.tsx`
+| Subscription | Purpose |
+| :--- | :--- |
+| `subscribeToUpgradeComplete` | Shows a toast and refreshes the empire grid the moment an upgrade finishes on-chain |
+| `subscribeToUpgradeStarted` | Shows a toast and refreshes the empire grid immediately when an upgrade begins |
+| `subscribeToBuildingPlaced` | Refreshes the empire grid instantly when a new building is placed |
+
+### `App.tsx`
+| Subscription | Purpose |
+| :--- | :--- |
+| `subscribeToAttackResolved` | Clears the incoming raid overlay and navigates to the Siege Chamber with the battle result the moment the battle resolves |
+
+### `BattleLog.tsx`
+| Subscription | Purpose |
+| :--- | :--- |
+| `subscribeToAllResolutions` | Reloads the Combat Archives instantly when any battle resolves on-chain — no polling needed |
+
+### `Legends.tsx`
+| Subscription | Purpose |
+| :--- | :--- |
+| `subscribeToRankingUpdated` | Refetches the leaderboard instantly when any player's ranking changes after a battle |
+| `EmpireRegistered` (direct) | Refetches the leaderboard and updates the Empires Active count the moment a new empire registers |
+
+### `GlobalBattleFeed.tsx`
+| Subscription | Purpose |
+| :--- | :--- |
+| `subscribeToGlobalBattleEvents` | Feeds real-time battle events into the global ticker feed as they happen on-chain |
+
+### `LiveEventFeed.tsx`
+| Subscription | Purpose |
+| :--- | :--- |
+| `subscribeToAllResolutions` | Adds every battle resolution to the live activity feed in real time |
+
+### `useGame.ts`
+| Subscription | Purpose |
+| :--- | :--- |
+| `subscribeToRankingUpdated` | Triggers an immediate leaderboard data refresh when rankings change on-chain |
+
+---
+
 ## ✨ Core Features
 
 **Real-Time PvP Battle System** — Launch a siege against any player on the leaderboard. The moment your attack lands on-chain, the defender's screen flashes an INCOMING RAID alert no matter what page they are on. They have 3 minutes to intercept or watch their resources drain.

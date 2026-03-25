@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { publicClient } from '../lib/somniaClients';
-import { CONTRACT_ADDRESSES, LEADERBOARD_CONTRACT_ABI } from '../constants/contracts';
+import { publicClient, reactivityClient } from '../lib/somniaClients';
+import { encodeEventTopics } from 'viem';
+import { CONTRACT_ADDRESSES, LEADERBOARD_CONTRACT_ABI, EMPIRE_REGISTRY_ABI } from '../constants/contracts';
+import { useReactivity } from '../hooks/useReactivity';
 
 interface LegendPlayer {
   rank: number;
@@ -32,6 +34,7 @@ export default function Legends() {
   const [opsToday, setOpsToday] = useState(0);
   const [cycleLoot, setCycleLoot] = useState(0);
   const [empiresActive, setEmpiresActive] = useState(0);
+  const { subscribeToRankingUpdated } = useReactivity();
 
   const [battles, setBattles] = useState<BattleEvent[]>([
     { id: 1, block: 85013, attacker: "Mystic Grove", defender: "Bandit Camp", loot: 450, type: 'victory' },
@@ -70,15 +73,14 @@ export default function Legends() {
     return () => clearInterval(interval);
   }, [feedBlock]);
 
-  useEffect(() => {
-    const fetchLeaderboard = async () => {
+  const fetchLeaderboard = useCallback(async () => {
       try {
         setPlayersLoading(true);
         const result = await publicClient.readContract({
           address: CONTRACT_ADDRESSES.LEADERBOARD_CONTRACT as `0x${string}`,
           abi: LEADERBOARD_CONTRACT_ABI,
           functionName: 'getTopPlayers',
-          args: [10]
+          args: [50]
         }) as any;
 
         if (!result || !result[0]) return;
@@ -117,7 +119,7 @@ export default function Legends() {
         );
 
         setPlayers(playerDetails);
-        setEmpiresActive(playerDetails.length);
+        setEmpiresActive(addresses.length);
 
         const totalLoot = playerDetails.reduce((sum, p) => sum + p.loot, 0);
         const totalOps = playerDetails.reduce((sum, p) => sum + p.wins + p.losses, 0);
@@ -128,9 +130,36 @@ export default function Legends() {
       } finally {
         setPlayersLoading(false);
       }
-    };
-    fetchLeaderboard();
   }, []);
+
+  // Initial fetch + 10s polling fallback
+  useEffect(() => {
+    fetchLeaderboard();
+    const interval = setInterval(fetchLeaderboard, 10000);
+    return () => clearInterval(interval);
+  }, [fetchLeaderboard]);
+
+  // Reactivity: refetch instantly on ranking changes or new empire registrations
+  useEffect(() => {
+    const unsubRanking = subscribeToRankingUpdated(() => {
+      fetchLeaderboard();
+    });
+
+    let unsubEmpire: (() => void) | undefined;
+    reactivityClient.subscribe({
+      ethCalls: [],
+      eventContractSources: [CONTRACT_ADDRESSES.EMPIRE_REGISTRY],
+      topicOverrides: encodeEventTopics({ abi: EMPIRE_REGISTRY_ABI, eventName: "EmpireRegistered" }),
+      onData: () => { fetchLeaderboard(); }
+    }).then((result: any) => {
+      if (!(result instanceof Error)) unsubEmpire = () => result.unsubscribe();
+    }).catch(() => {});
+
+    return () => {
+      unsubRanking();
+      if (unsubEmpire) unsubEmpire();
+    };
+  }, [fetchLeaderboard, subscribeToRankingUpdated]);
 
   return (
     <div className="h-full flex flex-col overflow-hidden bg-[#0A0A0F] text-slate-100 font-sans">

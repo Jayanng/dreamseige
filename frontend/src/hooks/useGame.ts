@@ -17,6 +17,7 @@ import {
   type PlayerStats,
 } from "../constants/contracts";
 import { streamsClient } from "../lib/somniaClients";
+import { useReactivity } from "./useReactivity";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BASE CONTRACT HOOKS
@@ -300,6 +301,7 @@ export function usePlayerStats(player?: `0x${string}`) {
 export function useTopPlayers(count: number = 20) {
   const [players, setPlayers] = useState<{ player: `0x${string}`; wins: number }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { subscribeToRankingUpdated } = useReactivity();
 
   useEffect(() => {
     let mounted = true;
@@ -341,13 +343,20 @@ export function useTopPlayers(count: number = 20) {
     };
 
     fetchLeaderboard();
+
+    // Reactivity: refetch instantly when any ranking changes on-chain
+    const unsubRanking = subscribeToRankingUpdated(() => {
+      fetchLeaderboard();
+    });
+
     const interval = setInterval(fetchLeaderboard, 30000); // Fallback refresh
 
     return () => {
       mounted = false;
+      unsubRanking();
       clearInterval(interval);
     };
-  }, [count]);
+  }, [count, subscribeToRankingUpdated]);
 
   return { players, isLoading, refetch: () => {} };
 }

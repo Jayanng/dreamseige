@@ -170,6 +170,7 @@ export default function Landing() {
     abi: LEADERBOARD_CONTRACT_ABI,
     functionName: 'getTopPlayers',
     args: [Number(50)],
+    query: { refetchInterval: 10000 },
   });
 
   const empiresActive = topPlayersData ? (topPlayersData as any)[0].length : 0;

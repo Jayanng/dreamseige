@@ -6,6 +6,7 @@ import { Trophy, TrendingUp, ShieldAlert, Skull, Sword, Wallet, Info } from 'luc
 import { publicClient } from '../lib/somniaClients';
 import { CONTRACT_ADDRESSES, PVP_ARENA_ABI, LEADERBOARD_CONTRACT_ABI } from '../constants/contracts';
 import { decodeEventLog } from 'viem';
+import { useReactivity } from '../hooks/useReactivity';
 
 interface BattleLogEntry {
   id: string;
@@ -28,6 +29,7 @@ interface BattleLogEntry {
 export default function BattleLog() {
   const navigate = useNavigate();
   const { address } = useAccount();
+  const { subscribeToAllResolutions } = useReactivity();
   const [filter, setFilter] = useState<'all' | 'victory' | 'defeat'>('all');
   
   const { data: playerStats } = useReadContract({
@@ -49,9 +51,11 @@ export default function BattleLog() {
     ? (stats.wins / (stats.wins + stats.losses)) * 100 
     : 0;
 
-  const netLoot = Number(stats.totalLootEarned || 0n);
-
   const [logs, setLogs] = useState<any[]>([]);
+
+  const netLoot = logs
+    .filter((l: any) => l.loot > 0)
+    .reduce((sum: number, l: any) => sum + Number(l.loot), 0);
   const [logsLoading, setLogsLoading] = useState(true);
   const [lastSynced, setLastSynced] = useState<string>('');
 
@@ -81,15 +85,21 @@ export default function BattleLog() {
     };
     window.addEventListener('storage', handleStorage);
 
+    // Reactivity: reload logs instantly when any battle resolves on-chain
+    const unsubResolutions = subscribeToAllResolutions(() => {
+      loadLogs();
+    });
+
     // Also poll every 5 seconds as fallback for same-tab updates
     const interval = setInterval(loadLogs, 5000);
 
     return () => {
       window.removeEventListener('focus', loadLogs);
       window.removeEventListener('storage', handleStorage);
+      unsubResolutions();
       clearInterval(interval);
     };
-  }, [address]);
+  }, [address, subscribeToAllResolutions]);
 
   const filteredLogs = logs.filter(log => {
     if (filter === 'all') return true;

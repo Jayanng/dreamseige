@@ -66,7 +66,7 @@ export default function Empire() {
   } = useGame();
   
   const publicClient = usePublicClient();
-  const { subscribeToUpgradeComplete, subscribeToBuildingPlaced } = useReactivity();
+  const { subscribeToUpgradeComplete, subscribeToBuildingPlaced, subscribeToUpgradeStarted } = useReactivity();
   const { startUpgrade, isPending: upgradePending } = useStartUpgrade();
   const { placeBuilding, isPending: buildPending, isSuccess: buildConfirmed, error: buildError } = usePlaceBuilding();
 
@@ -155,6 +155,12 @@ export default function Empire() {
       refreshEmpireState();
     });
 
+    // Subscribe to UpgradeStarted — refresh immediately so UI shows upgrading state
+    const unsubUpgradeStarted = subscribeToUpgradeStarted(base.id as bigint, (slot, newLevel, endsAt, jobId) => {
+      showToast(`⚙ Upgrade started on slot ${slot}!`, 'info');
+      refreshEmpireState();
+    });
+
     // Subscribe to BuildingPlaced via hook
     const unsubPlaced = subscribeToBuildingPlaced(base.id as bigint, (slot, buildingType) => {
       console.log(`Building placed on slot ${slot}: type ${buildingType}`);
@@ -163,9 +169,10 @@ export default function Empire() {
 
     return () => {
       unsubUpgrade();
+      unsubUpgradeStarted();
       unsubPlaced();
     };
-  }, [base?.id, subscribeToUpgradeComplete, subscribeToBuildingPlaced, refreshEmpireState, addEvent, buildings]);
+  }, [base?.id, subscribeToUpgradeComplete, subscribeToUpgradeStarted, subscribeToBuildingPlaced, refreshEmpireState, addEvent, buildings]);
 
   // Handle construction success
   useEffect(() => {
