@@ -2,7 +2,7 @@
 
 **Built on Somnia Network · Powered by the Somnia Reactivity SDK**
 
-**🎥 Demo Video:** [Watch on YouTube](https://youtu.be/t49XeeJbvR8) · **🌐 Live App:** https://dreamseige.vercel.app · **📦 GitHub:** https://github.com/Jayanng/dreamseige
+**🎥 Demo Video:** [Watch on YouTube](https://youtu.be/gQSM7FAoxn0) · **🌐 Live App:** https://dreamseige.vercel.app · **📦 GitHub:** https://github.com/Jayanng/dreamseige
 
 > Siege your dream empire in real time. Build. Raid. Defend. All on-chain.
 
