@@ -183,6 +183,7 @@ export default function Siege() {
   useEffect(() => {
     const state = location.state as any;
     if (state?.immediateResult) {
+      setBattleResultLoading(true);
       setBattleResult(state.immediateResult);
       window.history.replaceState({}, '');
     }
