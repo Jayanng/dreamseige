@@ -149,7 +149,7 @@ export default function Legends() {
     reactivityClient.subscribe({
       ethCalls: [],
       eventContractSources: [CONTRACT_ADDRESSES.EMPIRE_REGISTRY],
-      topicOverrides: encodeEventTopics({ abi: EMPIRE_REGISTRY_ABI, eventName: "EmpireRegistered" }),
+      topicOverrides: encodeEventTopics({ abi: EMPIRE_REGISTRY_ABI, eventName: "EmpireRegistered" }) as `0x${string}`[],
       onData: () => { fetchLeaderboard(); }
     }).then((result: any) => {
       if (!(result instanceof Error)) unsubEmpire = () => result.unsubscribe();
